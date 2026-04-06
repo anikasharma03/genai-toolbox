@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package dataplexsearchaspecttypes
+package knowledgecatalogsearchaspecttypes
 
 import (
 	"context"
@@ -28,7 +28,7 @@ import (
 	"github.com/googleapis/mcp-toolbox/internal/util/parameters"
 )
 
-const resourceType string = "dataplex-search-aspect-types"
+const resourceType string = "knowledge-catalog-search-aspect-types"
 
 func init() {
 	if !tools.Register(resourceType, newConfig) {

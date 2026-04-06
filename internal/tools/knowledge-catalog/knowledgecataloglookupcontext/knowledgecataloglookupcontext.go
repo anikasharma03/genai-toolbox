@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package dataplexlookupcontext
+package knowledgecataloglookupcontext
 
 import (
 	"context"
@@ -29,7 +29,7 @@ import (
 	"github.com/googleapis/mcp-toolbox/internal/util/parameters"
 )
 
-const resourceType string = "dataplex-lookup-context"
+const resourceType string = "knowledge-catalog-lookup-context"
 
 func init() {
 	if !tools.Register(resourceType, newConfig) {

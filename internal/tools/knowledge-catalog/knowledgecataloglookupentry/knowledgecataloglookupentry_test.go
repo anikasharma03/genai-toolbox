@@ -1,4 +1,4 @@
-// Copyright 2026 Google LLC
+// Copyright 2025 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package dataplexlookupcontext_test
+package knowledgecataloglookupentry_test
 
 import (
 	"testing"
@@ -20,10 +20,10 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/googleapis/mcp-toolbox/internal/server"
 	"github.com/googleapis/mcp-toolbox/internal/testutils"
-	"github.com/googleapis/mcp-toolbox/internal/tools/dataplex/dataplexlookupcontext"
+	"github.com/googleapis/mcp-toolbox/internal/tools/knowledge-catalog/knowledgecataloglookupentry"
 )
 
-func TestParseFromYamlDataplexLookupContext(t *testing.T) {
+func TestParseFromYamlKnowledgeCatalogLookupEntry(t *testing.T) {
 	ctx, err := testutils.ContextWithNewLogger()
 	if err != nil {
 		t.Fatalf("unexpected error: %s", err)
@@ -38,14 +38,14 @@ func TestParseFromYamlDataplexLookupContext(t *testing.T) {
 			in: `
             kind: tool
             name: example_tool
-            type: dataplex-lookup-context
+            type: knowledge-catalog-lookup-entry
             source: my-instance
             description: some description
             `,
 			want: server.ToolConfigs{
-				"example_tool": dataplexlookupcontext.Config{
+				"example_tool": knowledgecataloglookupentry.Config{
 					Name:         "example_tool",
-					Type:         "dataplex-lookup-context",
+					Type:         "knowledge-catalog-lookup-entry",
 					Source:       "my-instance",
 					Description:  "some description",
 					AuthRequired: []string{},

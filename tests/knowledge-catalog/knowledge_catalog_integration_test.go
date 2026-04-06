@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package dataplex
+package knowledgecatalog
 
 import (
 	"bytes"
@@ -40,22 +40,22 @@ import (
 )
 
 var (
-	DataplexSourceType                = "dataplex"
-	DataplexLookupContextToolType     = "dataplex-lookup-context"
-	DataplexSearchEntriesToolType     = "dataplex-search-entries"
-	DataplexLookupEntryToolType       = "dataplex-lookup-entry"
-	DataplexSearchAspectTypesToolType = "dataplex-search-aspect-types"
-	DataplexProject                   = os.Getenv("DATAPLEX_PROJECT")
+	KnowledgeCatalogSourceType                = "knowledge-catalog"
+	KnowledgeCatalogLookupContextToolType     = "knowledge-catalog-lookup-context"
+	KnowledgeCatalogSearchEntriesToolType     = "knowledge-catalog-search-entries"
+	KnowledgeCatalogLookupEntryToolType       = "knowledge-catalog-lookup-entry"
+	KnowledgeCatalogSearchAspectTypesToolType = "knowledge-catalog-search-aspect-types"
+	KnowledgeCatalogProject                   = os.Getenv("DATAPLEX_PROJECT")
 )
 
-func getDataplexVars(t *testing.T) map[string]any {
+func getKnowledgeCatalogVars(t *testing.T) map[string]any {
 	switch "" {
-	case DataplexProject:
+	case KnowledgeCatalogProject:
 		t.Fatal("'DATAPLEX_PROJECT' not set")
 	}
 	return map[string]any{
-		"type":    DataplexSourceType,
-		"project": DataplexProject,
+		"type":    KnowledgeCatalogSourceType,
+		"project": KnowledgeCatalogProject,
 	}
 }
 
@@ -73,7 +73,7 @@ func initBigQueryConnection(ctx context.Context, project string) (*bigqueryapi.C
 	return client, nil
 }
 
-func initDataplexConnection(ctx context.Context) (*dataplex.CatalogClient, error) {
+func initKnowledgeCatalogConnection(ctx context.Context) (*dataplex.CatalogClient, error) {
 	cred, err := google.FindDefaultCredentials(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("failed to find default Google Cloud credentials: %w", err)
@@ -88,7 +88,7 @@ func initDataplexConnection(ctx context.Context) (*dataplex.CatalogClient, error
 
 // cleanupOldAspectTypes Deletes AspectTypes older than the specified duration.
 func cleanupOldAspectTypes(t *testing.T, ctx context.Context, client *dataplex.CatalogClient, oldThreshold time.Duration) {
-	parent := fmt.Sprintf("projects/%s/locations/us", DataplexProject)
+	parent := fmt.Sprintf("projects/%s/locations/us", KnowledgeCatalogProject)
 	olderThanTime := time.Now().Add(-oldThreshold)
 
 	listReq := &dataplexpb.ListAspectTypesRequest{
@@ -140,18 +140,18 @@ func cleanupOldAspectTypes(t *testing.T, ctx context.Context, client *dataplex.C
 	}
 }
 
-func TestDataplexToolEndpoints(t *testing.T) {
-	sourceConfig := getDataplexVars(t)
+func TestKnowledgeCatalogToolEndpoints(t *testing.T) {
+	sourceConfig := getKnowledgeCatalogVars(t)
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Minute)
 	defer cancel()
 
 	args := []string{"--enable-api"}
-	bigqueryClient, err := initBigQueryConnection(ctx, DataplexProject)
+	bigqueryClient, err := initBigQueryConnection(ctx, KnowledgeCatalogProject)
 	if err != nil {
 		t.Fatalf("unable to create Cloud SQL connection pool: %s", err)
 	}
 
-	dataplexClient, err := initDataplexConnection(ctx)
+	dataplexClient, err := initKnowledgeCatalogConnection(ctx)
 	if err != nil {
 		t.Fatalf("unable to create Dataplex connection: %s", err)
 	}
@@ -165,12 +165,12 @@ func TestDataplexToolEndpoints(t *testing.T) {
 	aspectTypeId := fmt.Sprintf("param-aspect-type-%s", strings.ReplaceAll(uuid.New().String(), "-", ""))
 
 	teardownTable1 := setupBigQueryTable(t, ctx, bigqueryClient, datasetName, tableName)
-	teardownAspectType1 := setupDataplexThirdPartyAspectType(t, ctx, dataplexClient, aspectTypeId)
+	teardownAspectType1 := setupKnowledgeCatalogThirdPartyAspectType(t, ctx, dataplexClient, aspectTypeId)
 	time.Sleep(2 * time.Minute) // wait for table and aspect type to be ingested
 	defer teardownTable1(t)
 	defer teardownAspectType1(t)
 
-	toolsFile := getDataplexToolsConfig(sourceConfig)
+	toolsFile := getKnowledgeCatalogToolsConfig(sourceConfig)
 
 	cmd, cleanup, err := tests.StartCmd(ctx, toolsFile, args...)
 	if err != nil {
@@ -186,11 +186,11 @@ func TestDataplexToolEndpoints(t *testing.T) {
 		t.Fatalf("toolbox didn't start successfully: %s", err)
 	}
 
-	runDataplexToolGetTest(t)
-	runDataplexSearchEntriesToolInvokeTest(t, tableName, datasetName)
-	runDataplexLookupEntryToolInvokeTest(t, tableName, datasetName)
-	runDataplexSearchAspectTypesToolInvokeTest(t, aspectTypeId)
-	runDataplexLookupContextToolInvokeTest(t, tableName, datasetName)
+	runKnowledgeCatalogToolGetTest(t)
+	runKnowledgeCatalogSearchEntriesToolInvokeTest(t, tableName, datasetName)
+	runKnowledgeCatalogLookupEntryToolInvokeTest(t, tableName, datasetName)
+	runKnowledgeCatalogSearchAspectTypesToolInvokeTest(t, aspectTypeId)
+	runKnowledgeCatalogLookupContextToolInvokeTest(t, tableName, datasetName)
 }
 
 func setupBigQueryTable(t *testing.T, ctx context.Context, client *bigqueryapi.Client, datasetName string, tableName string) func(*testing.T) {
@@ -248,8 +248,8 @@ func setupBigQueryTable(t *testing.T, ctx context.Context, client *bigqueryapi.C
 	}
 }
 
-func setupDataplexThirdPartyAspectType(t *testing.T, ctx context.Context, client *dataplex.CatalogClient, aspectTypeId string) func(*testing.T) {
-	parent := fmt.Sprintf("projects/%s/locations/us", DataplexProject)
+func setupKnowledgeCatalogThirdPartyAspectType(t *testing.T, ctx context.Context, client *dataplex.CatalogClient, aspectTypeId string) func(*testing.T) {
+	parent := fmt.Sprintf("projects/%s/locations/us", KnowledgeCatalogProject)
 	createAspectTypeReq := &dataplexpb.CreateAspectTypeRequest{
 		Parent:       parent,
 		AspectTypeId: aspectTypeId,
@@ -277,11 +277,11 @@ func setupDataplexThirdPartyAspectType(t *testing.T, ctx context.Context, client
 	}
 }
 
-func getDataplexToolsConfig(sourceConfig map[string]any) map[string]any {
+func getKnowledgeCatalogToolsConfig(sourceConfig map[string]any) map[string]any {
 	// Write config into a file and pass it to command
 	toolsFile := map[string]any{
 		"sources": map[string]any{
-			"my-dataplex-instance": sourceConfig,
+			"my-knowledge-catalog-instance": sourceConfig,
 		},
 		"authServices": map[string]any{
 			"my-google-auth": map[string]any{
@@ -290,48 +290,48 @@ func getDataplexToolsConfig(sourceConfig map[string]any) map[string]any {
 			},
 		},
 		"tools": map[string]any{
-			"my-dataplex-search-entries-tool": map[string]any{
-				"type":        DataplexSearchEntriesToolType,
-				"source":      "my-dataplex-instance",
-				"description": "Simple dataplex search entries tool to test end to end functionality.",
+			"my-knowledge-catalog-search-entries-tool": map[string]any{
+				"type":        KnowledgeCatalogSearchEntriesToolType,
+				"source":      "my-knowledge-catalog-instance",
+				"description": "Simple knowledge catalog search entries tool to test end to end functionality.",
 			},
-			"my-auth-dataplex-search-entries-tool": map[string]any{
-				"type":         DataplexSearchEntriesToolType,
-				"source":       "my-dataplex-instance",
-				"description":  "Simple dataplex search entries tool to test end to end functionality.",
+			"my-auth-knowledge-catalog-search-entries-tool": map[string]any{
+				"type":         KnowledgeCatalogSearchEntriesToolType,
+				"source":       "my-knowledge-catalog-instance",
+				"description":  "Simple knowledge catalog search entries tool to test end to end functionality.",
 				"authRequired": []string{"my-google-auth"},
 			},
-			"my-dataplex-lookup-entry-tool": map[string]any{
-				"type":        DataplexLookupEntryToolType,
-				"source":      "my-dataplex-instance",
-				"description": "Simple dataplex lookup entry tool to test end to end functionality.",
+			"my-knowledge-catalog-lookup-entry-tool": map[string]any{
+				"type":        KnowledgeCatalogLookupEntryToolType,
+				"source":      "my-knowledge-catalog-instance",
+				"description": "Simple knowledge catalog lookup entry tool to test end to end functionality.",
 			},
-			"my-auth-dataplex-lookup-entry-tool": map[string]any{
-				"type":         DataplexLookupEntryToolType,
-				"source":       "my-dataplex-instance",
-				"description":  "Simple dataplex lookup entry tool to test end to end functionality.",
+			"my-auth-knowledge-catalog-lookup-entry-tool": map[string]any{
+				"type":         KnowledgeCatalogLookupEntryToolType,
+				"source":       "my-knowledge-catalog-instance",
+				"description":  "Simple knowledge catalog lookup entry tool to test end to end functionality.",
 				"authRequired": []string{"my-google-auth"},
 			},
-			"my-dataplex-search-aspect-types-tool": map[string]any{
-				"type":        DataplexSearchAspectTypesToolType,
-				"source":      "my-dataplex-instance",
-				"description": "Simple dataplex search aspect types tool to test end to end functionality.",
+			"my-knowledge-catalog-search-aspect-types-tool": map[string]any{
+				"type":        KnowledgeCatalogSearchAspectTypesToolType,
+				"source":      "my-knowledge-catalog-instance",
+				"description": "Simple knowledge catalog search aspect types tool to test end to end functionality.",
 			},
-			"my-auth-dataplex-search-aspect-types-tool": map[string]any{
-				"type":         DataplexSearchAspectTypesToolType,
-				"source":       "my-dataplex-instance",
-				"description":  "Simple dataplex search aspect types tool to test end to end functionality.",
+			"my-auth-knowledge-catalog-search-aspect-types-tool": map[string]any{
+				"type":         KnowledgeCatalogSearchAspectTypesToolType,
+				"source":       "my-knowledge-catalog-instance",
+				"description":  "Simple knowledge catalog search aspect types tool to test end to end functionality.",
 				"authRequired": []string{"my-google-auth"},
 			},
-			"my-dataplex-lookup-context-tool": map[string]any{
-				"type":        DataplexLookupContextToolType,
-				"source":      "my-dataplex-instance",
-				"description": "Simple dataplex lookup context tool to test end to end functionality.",
+			"my-knowledge-catalog-lookup-context-tool": map[string]any{
+				"type":        KnowledgeCatalogLookupContextToolType,
+				"source":      "my-knowledge-catalog-instance",
+				"description": "Simple knowledge catalog lookup context tool to test end to end functionality.",
 			},
-			"my-auth-dataplex-lookup-context-tool": map[string]any{
-				"type":         DataplexLookupContextToolType,
-				"source":       "my-dataplex-instance",
-				"description":  "Simple dataplex lookup context tool to test end to end functionality.",
+			"my-auth-knowledge-catalog-lookup-context-tool": map[string]any{
+				"type":         KnowledgeCatalogLookupContextToolType,
+				"source":       "my-knowledge-catalog-instance",
+				"description":  "Simple knowledge catalog lookup context tool to test end to end functionality.",
 				"authRequired": []string{"my-google-auth"},
 			},
 		},
@@ -340,25 +340,25 @@ func getDataplexToolsConfig(sourceConfig map[string]any) map[string]any {
 	return toolsFile
 }
 
-func runDataplexToolGetTest(t *testing.T) {
+func runKnowledgeCatalogToolGetTest(t *testing.T) {
 	testCases := []struct {
 		name           string
 		toolName       string
 		expectedParams []string
 	}{
 		{
-			name:           "get my-dataplex-search-entries-tool",
-			toolName:       "my-dataplex-search-entries-tool",
+			name:           "get my-knowledge-catalog-search-entries-tool",
+			toolName:       "my-knowledge-catalog-search-entries-tool",
 			expectedParams: []string{"pageSize", "query", "orderBy", "scope"},
 		},
 		{
-			name:           "get my-dataplex-lookup-entry-tool",
-			toolName:       "my-dataplex-lookup-entry-tool",
+			name:           "get my-knowledge-catalog-lookup-entry-tool",
+			toolName:       "my-knowledge-catalog-lookup-entry-tool",
 			expectedParams: []string{"entry", "view", "aspectTypes"},
 		},
 		{
-			name:           "get my-dataplex-search-aspect-types-tool",
-			toolName:       "my-dataplex-search-aspect-types-tool",
+			name:           "get my-knowledge-catalog-search-aspect-types-tool",
+			toolName:       "my-knowledge-catalog-search-aspect-types-tool",
 			expectedParams: []string{"pageSize", "query", "orderBy"},
 		},
 	}
@@ -417,7 +417,7 @@ func runDataplexToolGetTest(t *testing.T) {
 	}
 }
 
-func runDataplexSearchEntriesToolInvokeTest(t *testing.T, tableName string, datasetName string) {
+func runKnowledgeCatalogSearchEntriesToolInvokeTest(t *testing.T, tableName string, datasetName string) {
 	idToken, err := tests.GetGoogleIdToken(t)
 	if err != nil {
 		t.Fatalf("error getting Google ID token: %s", err)
@@ -434,7 +434,7 @@ func runDataplexSearchEntriesToolInvokeTest(t *testing.T, tableName string, data
 	}{
 		{
 			name:           "Success - Entry Found",
-			api:            "http://127.0.0.1:5000/api/tool/my-dataplex-search-entries-tool/invoke",
+			api:            "http://127.0.0.1:5000/api/tool/my-knowledge-catalog-search-entries-tool/invoke",
 			requestHeader:  map[string]string{},
 			requestBody:    bytes.NewBuffer([]byte(fmt.Sprintf("{\"query\":\"displayname=%s system=bigquery parent:%s\"}", tableName, datasetName))),
 			wantStatusCode: 200,
@@ -443,16 +443,16 @@ func runDataplexSearchEntriesToolInvokeTest(t *testing.T, tableName string, data
 		},
 		{
 			name:           "Success - Entry Found with Scope",
-			api:            "http://127.0.0.1:5000/api/tool/my-dataplex-search-entries-tool/invoke",
+			api:            "http://127.0.0.1:5000/api/tool/my-knowledge-catalog-search-entries-tool/invoke",
 			requestHeader:  map[string]string{},
-			requestBody:    bytes.NewBuffer([]byte(fmt.Sprintf("{\"query\":\"displayname=%s system=bigquery parent:%s\", \"scope\":\"projects/%s\"}", tableName, datasetName, DataplexProject))),
+			requestBody:    bytes.NewBuffer([]byte(fmt.Sprintf("{\"query\":\"displayname=%s system=bigquery parent:%s\", \"scope\":\"projects/%s\"}", tableName, datasetName, KnowledgeCatalogProject))),
 			wantStatusCode: 200,
 			expectResult:   true,
 			wantContentKey: "dataplex_entry",
 		},
 		{
 			name:           "Success with Authorization - Entry Found",
-			api:            "http://127.0.0.1:5000/api/tool/my-auth-dataplex-search-entries-tool/invoke",
+			api:            "http://127.0.0.1:5000/api/tool/my-auth-knowledge-catalog-search-entries-tool/invoke",
 			requestHeader:  map[string]string{"my-google-auth_token": idToken},
 			requestBody:    bytes.NewBuffer([]byte(fmt.Sprintf("{\"query\":\"displayname=%s system=bigquery parent:%s\"}", tableName, datasetName))),
 			wantStatusCode: 200,
@@ -461,7 +461,7 @@ func runDataplexSearchEntriesToolInvokeTest(t *testing.T, tableName string, data
 		},
 		{
 			name:           "Failure - Invalid Authorization Token",
-			api:            "http://127.0.0.1:5000/api/tool/my-auth-dataplex-search-entries-tool/invoke",
+			api:            "http://127.0.0.1:5000/api/tool/my-auth-knowledge-catalog-search-entries-tool/invoke",
 			requestHeader:  map[string]string{"my-google-auth_token": "invalid_token"},
 			requestBody:    bytes.NewBuffer([]byte(fmt.Sprintf("{\"query\":\"displayname=%s system=bigquery parent:%s\"}", tableName, datasetName))),
 			wantStatusCode: 401,
@@ -470,7 +470,7 @@ func runDataplexSearchEntriesToolInvokeTest(t *testing.T, tableName string, data
 		},
 		{
 			name:           "Failure - Without Authorization Token",
-			api:            "http://127.0.0.1:5000/api/tool/my-auth-dataplex-search-entries-tool/invoke",
+			api:            "http://127.0.0.1:5000/api/tool/my-auth-knowledge-catalog-search-entries-tool/invoke",
 			requestHeader:  map[string]string{},
 			requestBody:    bytes.NewBuffer([]byte(fmt.Sprintf("{\"query\":\"displayname=%s system=bigquery parent:%s\"}", tableName, datasetName))),
 			wantStatusCode: 401,
@@ -479,7 +479,7 @@ func runDataplexSearchEntriesToolInvokeTest(t *testing.T, tableName string, data
 		},
 		{
 			name:           "Failure - Entry Not Found",
-			api:            "http://127.0.0.1:5000/api/tool/my-dataplex-search-entries-tool/invoke",
+			api:            "http://127.0.0.1:5000/api/tool/my-knowledge-catalog-search-entries-tool/invoke",
 			requestHeader:  map[string]string{},
 			requestBody:    bytes.NewBuffer([]byte(`{"query":"displayname=\"\" system=bigquery parent:\"\""}`)),
 			wantStatusCode: 200,
@@ -550,7 +550,7 @@ func runDataplexSearchEntriesToolInvokeTest(t *testing.T, tableName string, data
 	}
 }
 
-func runDataplexLookupEntryToolInvokeTest(t *testing.T, tableName string, datasetName string) {
+func runKnowledgeCatalogLookupEntryToolInvokeTest(t *testing.T, tableName string, datasetName string) {
 	idToken, err := tests.GetGoogleIdToken(t)
 	if err != nil {
 		t.Fatalf("error getting Google ID token: %s", err)
@@ -570,43 +570,43 @@ func runDataplexLookupEntryToolInvokeTest(t *testing.T, tableName string, datase
 	}{
 		{
 			name:           "Success - Entry Found",
-			api:            "http://127.0.0.1:5000/api/tool/my-dataplex-lookup-entry-tool/invoke",
+			api:            "http://127.0.0.1:5000/api/tool/my-knowledge-catalog-lookup-entry-tool/invoke",
 			requestHeader:  map[string]string{},
-			requestBody:    bytes.NewBuffer([]byte(fmt.Sprintf("{\"name\":\"projects/%s/locations/us\", \"entry\":\"projects/%s/locations/us/entryGroups/@bigquery/entries/bigquery.googleapis.com/projects/%s/datasets/%s\"}", DataplexProject, DataplexProject, DataplexProject, datasetName))),
+			requestBody:    bytes.NewBuffer([]byte(fmt.Sprintf("{\"name\":\"projects/%s/locations/us\", \"entry\":\"projects/%s/locations/us/entryGroups/@bigquery/entries/bigquery.googleapis.com/projects/%s/datasets/%s\"}", KnowledgeCatalogProject, KnowledgeCatalogProject, KnowledgeCatalogProject, datasetName))),
 			wantStatusCode: 200,
 			expectResult:   true,
 			wantContentKey: "name",
 		},
 		{
 			name:           "Success - Entry Found with Authorization",
-			api:            "http://127.0.0.1:5000/api/tool/my-auth-dataplex-lookup-entry-tool/invoke",
+			api:            "http://127.0.0.1:5000/api/tool/my-auth-knowledge-catalog-lookup-entry-tool/invoke",
 			requestHeader:  map[string]string{"my-google-auth_token": idToken},
-			requestBody:    bytes.NewBuffer([]byte(fmt.Sprintf("{\"entry\":\"projects/%s/locations/us/entryGroups/@bigquery/entries/bigquery.googleapis.com/projects/%s/datasets/%s\"}", DataplexProject, DataplexProject, datasetName))),
+			requestBody:    bytes.NewBuffer([]byte(fmt.Sprintf("{\"entry\":\"projects/%s/locations/us/entryGroups/@bigquery/entries/bigquery.googleapis.com/projects/%s/datasets/%s\"}", KnowledgeCatalogProject, KnowledgeCatalogProject, datasetName))),
 			wantStatusCode: 200,
 			expectResult:   true,
 			wantContentKey: "name",
 		},
 		{
 			name:           "Failure - Invalid Authorization Token",
-			api:            "http://127.0.0.1:5000/api/tool/my-auth-dataplex-lookup-entry-tool/invoke",
+			api:            "http://127.0.0.1:5000/api/tool/my-auth-knowledge-catalog-lookup-entry-tool/invoke",
 			requestHeader:  map[string]string{"my-google-auth_token": "invalid_token"},
-			requestBody:    bytes.NewBuffer([]byte(fmt.Sprintf("{\"entry\":\"projects/%s/locations/us/entryGroups/@bigquery/entries/bigquery.googleapis.com/projects/%s/datasets/%s\"}", DataplexProject, DataplexProject, datasetName))),
+			requestBody:    bytes.NewBuffer([]byte(fmt.Sprintf("{\"entry\":\"projects/%s/locations/us/entryGroups/@bigquery/entries/bigquery.googleapis.com/projects/%s/datasets/%s\"}", KnowledgeCatalogProject, KnowledgeCatalogProject, datasetName))),
 			wantStatusCode: 401,
 			expectResult:   false,
 			wantContentKey: "name",
 		},
 		{
 			name:           "Failure - Without Authorization Token",
-			api:            "http://127.0.0.1:5000/api/tool/my-auth-dataplex-lookup-entry-tool/invoke",
+			api:            "http://127.0.0.1:5000/api/tool/my-auth-knowledge-catalog-lookup-entry-tool/invoke",
 			requestHeader:  map[string]string{},
-			requestBody:    bytes.NewBuffer([]byte(fmt.Sprintf("{\"entry\":\"projects/%s/locations/us/entryGroups/@bigquery/entries/bigquery.googleapis.com/projects/%s/datasets/%s\"}", DataplexProject, DataplexProject, datasetName))),
+			requestBody:    bytes.NewBuffer([]byte(fmt.Sprintf("{\"entry\":\"projects/%s/locations/us/entryGroups/@bigquery/entries/bigquery.googleapis.com/projects/%s/datasets/%s\"}", KnowledgeCatalogProject, KnowledgeCatalogProject, datasetName))),
 			wantStatusCode: 401,
 			expectResult:   false,
 			wantContentKey: "name",
 		},
 		{
 			name:           "Failure - Invalid Entry Format",
-			api:            "http://127.0.0.1:5000/api/tool/my-dataplex-lookup-entry-tool/invoke",
+			api:            "http://127.0.0.1:5000/api/tool/my-knowledge-catalog-lookup-entry-tool/invoke",
 			requestHeader:  map[string]string{},
 			requestBody:    bytes.NewBuffer([]byte(`{"entry":"invalid/entry/format"}`)),
 			wantStatusCode: 200,
@@ -614,17 +614,17 @@ func runDataplexLookupEntryToolInvokeTest(t *testing.T, tableName string, datase
 		},
 		{
 			name:           "Failure - Entry Not Found or Permission Denied",
-			api:            "http://127.0.0.1:5000/api/tool/my-dataplex-lookup-entry-tool/invoke",
+			api:            "http://127.0.0.1:5000/api/tool/my-knowledge-catalog-lookup-entry-tool/invoke",
 			requestHeader:  map[string]string{},
-			requestBody:    bytes.NewBuffer([]byte(fmt.Sprintf("{\"entry\":\"projects/%s/locations/us/entryGroups/@bigquery/entries/bigquery.googleapis.com/projects/%s/datasets/%s\"}", DataplexProject, DataplexProject, "non-existent-dataset"))),
+			requestBody:    bytes.NewBuffer([]byte(fmt.Sprintf("{\"entry\":\"projects/%s/locations/us/entryGroups/@bigquery/entries/bigquery.googleapis.com/projects/%s/datasets/%s\"}", KnowledgeCatalogProject, KnowledgeCatalogProject, "non-existent-dataset"))),
 			wantStatusCode: 200,
 			expectResult:   false,
 		},
 		{
 			name:               "Success - Entry Found with Basic View",
-			api:                "http://127.0.0.1:5000/api/tool/my-dataplex-lookup-entry-tool/invoke",
+			api:                "http://127.0.0.1:5000/api/tool/my-knowledge-catalog-lookup-entry-tool/invoke",
 			requestHeader:      map[string]string{},
-			requestBody:        bytes.NewBuffer([]byte(fmt.Sprintf("{\"entry\":\"projects/%s/locations/us/entryGroups/@bigquery/entries/bigquery.googleapis.com/projects/%s/datasets/%s/tables/%s\", \"view\": %d}", DataplexProject, DataplexProject, datasetName, tableName, 1))),
+			requestBody:        bytes.NewBuffer([]byte(fmt.Sprintf("{\"entry\":\"projects/%s/locations/us/entryGroups/@bigquery/entries/bigquery.googleapis.com/projects/%s/datasets/%s/tables/%s\", \"view\": %d}", KnowledgeCatalogProject, KnowledgeCatalogProject, datasetName, tableName, 1))),
 			wantStatusCode:     200,
 			expectResult:       true,
 			wantContentKey:     "name",
@@ -632,17 +632,17 @@ func runDataplexLookupEntryToolInvokeTest(t *testing.T, tableName string, datase
 		},
 		{
 			name:           "Failure - Entry with Custom View without Aspect Types",
-			api:            "http://127.0.0.1:5000/api/tool/my-dataplex-lookup-entry-tool/invoke",
+			api:            "http://127.0.0.1:5000/api/tool/my-knowledge-catalog-lookup-entry-tool/invoke",
 			requestHeader:  map[string]string{},
-			requestBody:    bytes.NewBuffer([]byte(fmt.Sprintf("{\"entry\":\"projects/%s/locations/us/entryGroups/@bigquery/entries/bigquery.googleapis.com/projects/%s/datasets/%s/tables/%s\", \"view\": %d}", DataplexProject, DataplexProject, datasetName, tableName, 3))),
+			requestBody:    bytes.NewBuffer([]byte(fmt.Sprintf("{\"entry\":\"projects/%s/locations/us/entryGroups/@bigquery/entries/bigquery.googleapis.com/projects/%s/datasets/%s/tables/%s\", \"view\": %d}", KnowledgeCatalogProject, KnowledgeCatalogProject, datasetName, tableName, 3))),
 			wantStatusCode: 200,
 			expectResult:   false,
 		},
 		{
 			name:           "Success - Entry Found with only Schema Aspect",
-			api:            "http://127.0.0.1:5000/api/tool/my-dataplex-lookup-entry-tool/invoke",
+			api:            "http://127.0.0.1:5000/api/tool/my-knowledge-catalog-lookup-entry-tool/invoke",
 			requestHeader:  map[string]string{},
-			requestBody:    bytes.NewBuffer([]byte(fmt.Sprintf("{\"entry\":\"projects/%s/locations/us/entryGroups/@bigquery/entries/bigquery.googleapis.com/projects/%s/datasets/%s/tables/%s\", \"aspectTypes\":[\"projects/dataplex-types/locations/global/aspectTypes/schema\"], \"view\": %d}", DataplexProject, DataplexProject, datasetName, tableName, 3))),
+			requestBody:    bytes.NewBuffer([]byte(fmt.Sprintf("{\"entry\":\"projects/%s/locations/us/entryGroups/@bigquery/entries/bigquery.googleapis.com/projects/%s/datasets/%s/tables/%s\", \"aspectTypes\":[\"projects/dataplex-types/locations/global/aspectTypes/schema\"], \"view\": %d}", KnowledgeCatalogProject, KnowledgeCatalogProject, datasetName, tableName, 3))),
 			wantStatusCode: 200,
 			expectResult:   true,
 			wantContentKey: "aspects",
@@ -720,7 +720,7 @@ func runDataplexLookupEntryToolInvokeTest(t *testing.T, tableName string, datase
 	}
 }
 
-func runDataplexSearchAspectTypesToolInvokeTest(t *testing.T, aspectTypeId string) {
+func runKnowledgeCatalogSearchAspectTypesToolInvokeTest(t *testing.T, aspectTypeId string) {
 	idToken, err := tests.GetGoogleIdToken(t)
 	if err != nil {
 		t.Fatalf("error getting Google ID token: %s", err)
@@ -737,7 +737,7 @@ func runDataplexSearchAspectTypesToolInvokeTest(t *testing.T, aspectTypeId strin
 	}{
 		{
 			name:           "Success - Aspect Type Found",
-			api:            "http://127.0.0.1:5000/api/tool/my-dataplex-search-aspect-types-tool/invoke",
+			api:            "http://127.0.0.1:5000/api/tool/my-knowledge-catalog-search-aspect-types-tool/invoke",
 			requestHeader:  map[string]string{},
 			requestBody:    bytes.NewBuffer([]byte(fmt.Sprintf("{\"query\":\"name:%s_aspectType\"}", aspectTypeId))),
 			wantStatusCode: 200,
@@ -746,7 +746,7 @@ func runDataplexSearchAspectTypesToolInvokeTest(t *testing.T, aspectTypeId strin
 		},
 		{
 			name:           "Success - Aspect Type Found with Authorization",
-			api:            "http://127.0.0.1:5000/api/tool/my-auth-dataplex-search-aspect-types-tool/invoke",
+			api:            "http://127.0.0.1:5000/api/tool/my-auth-knowledge-catalog-search-aspect-types-tool/invoke",
 			requestHeader:  map[string]string{"my-google-auth_token": idToken},
 			requestBody:    bytes.NewBuffer([]byte(fmt.Sprintf("{\"query\":\"name:%s_aspectType\"}", aspectTypeId))),
 			wantStatusCode: 200,
@@ -755,7 +755,7 @@ func runDataplexSearchAspectTypesToolInvokeTest(t *testing.T, aspectTypeId strin
 		},
 		{
 			name:           "Failure - Aspect Type Not Found",
-			api:            "http://127.0.0.1:5000/api/tool/my-dataplex-search-aspect-types-tool/invoke",
+			api:            "http://127.0.0.1:5000/api/tool/my-knowledge-catalog-search-aspect-types-tool/invoke",
 			requestHeader:  map[string]string{},
 			requestBody:    bytes.NewBuffer([]byte(`"{\"query\":\"name:_aspectType\"}"`)),
 			wantStatusCode: 400,
@@ -763,7 +763,7 @@ func runDataplexSearchAspectTypesToolInvokeTest(t *testing.T, aspectTypeId strin
 		},
 		{
 			name:           "Failure - Invalid Authorization Token",
-			api:            "http://127.0.0.1:5000/api/tool/my-auth-dataplex-search-aspect-types-tool/invoke",
+			api:            "http://127.0.0.1:5000/api/tool/my-auth-knowledge-catalog-search-aspect-types-tool/invoke",
 			requestHeader:  map[string]string{"my-google-auth_token": "invalid_token"},
 			requestBody:    bytes.NewBuffer([]byte(fmt.Sprintf("{\"query\":\"name:%s_aspectType\"}", aspectTypeId))),
 			wantStatusCode: 401,
@@ -771,7 +771,7 @@ func runDataplexSearchAspectTypesToolInvokeTest(t *testing.T, aspectTypeId strin
 		},
 		{
 			name:           "Failure - No Authorization Token",
-			api:            "http://127.0.0.1:5000/api/tool/my-auth-dataplex-search-aspect-types-tool/invoke",
+			api:            "http://127.0.0.1:5000/api/tool/my-auth-knowledge-catalog-search-aspect-types-tool/invoke",
 			requestHeader:  map[string]string{},
 			requestBody:    bytes.NewBuffer([]byte(fmt.Sprintf("{\"query\":\"name:%s_aspectType\"}", aspectTypeId))),
 			wantStatusCode: 401,
@@ -836,13 +836,13 @@ func runDataplexSearchAspectTypesToolInvokeTest(t *testing.T, aspectTypeId strin
 	}
 }
 
-func runDataplexLookupContextToolInvokeTest(t *testing.T, tableName string, datasetName string) {
+func runKnowledgeCatalogLookupContextToolInvokeTest(t *testing.T, tableName string, datasetName string) {
 	idToken, err := tests.GetGoogleIdToken(t)
 	if err != nil {
 		t.Fatalf("error getting Google ID token: %s", err)
 	}
 
-	resourceName := fmt.Sprintf("projects/%s/locations/us/entryGroups/@bigquery/entries/bigquery.googleapis.com/projects/%s/datasets/%s/tables/%s", DataplexProject, DataplexProject, datasetName, tableName)
+	resourceName := fmt.Sprintf("projects/%s/locations/us/entryGroups/@bigquery/entries/bigquery.googleapis.com/projects/%s/datasets/%s/tables/%s", KnowledgeCatalogProject, KnowledgeCatalogProject, datasetName, tableName)
 	requestBodyFmt := fmt.Sprintf(`{"resources":["%s"]}`, resourceName)
 
 	testCases := []struct {
@@ -856,7 +856,7 @@ func runDataplexLookupContextToolInvokeTest(t *testing.T, tableName string, data
 	}{
 		{
 			name:           "Success - Context Found",
-			api:            "http://127.0.0.1:5000/api/tool/my-dataplex-lookup-context-tool/invoke",
+			api:            "http://127.0.0.1:5000/api/tool/my-knowledge-catalog-lookup-context-tool/invoke",
 			requestHeader:  map[string]string{},
 			requestBody:    bytes.NewBufferString(requestBodyFmt),
 			wantStatusCode: 200,
@@ -865,7 +865,7 @@ func runDataplexLookupContextToolInvokeTest(t *testing.T, tableName string, data
 		},
 		{
 			name:           "Success with Authorization - Context Found",
-			api:            "http://127.0.0.1:5000/api/tool/my-auth-dataplex-lookup-context-tool/invoke",
+			api:            "http://127.0.0.1:5000/api/tool/my-auth-knowledge-catalog-lookup-context-tool/invoke",
 			requestHeader:  map[string]string{"my-google-auth_token": idToken},
 			requestBody:    bytes.NewBufferString(requestBodyFmt),
 			wantStatusCode: 200,
@@ -874,7 +874,7 @@ func runDataplexLookupContextToolInvokeTest(t *testing.T, tableName string, data
 		},
 		{
 			name:           "Failure - Invalid Authorization Token",
-			api:            "http://127.0.0.1:5000/api/tool/my-auth-dataplex-lookup-context-tool/invoke",
+			api:            "http://127.0.0.1:5000/api/tool/my-auth-knowledge-catalog-lookup-context-tool/invoke",
 			requestHeader:  map[string]string{"my-google-auth_token": "invalid_token"},
 			requestBody:    bytes.NewBufferString(requestBodyFmt),
 			wantStatusCode: 401,
@@ -883,7 +883,7 @@ func runDataplexLookupContextToolInvokeTest(t *testing.T, tableName string, data
 		},
 		{
 			name:           "Failure - Invalid Resource Format",
-			api:            "http://127.0.0.1:5000/api/tool/my-dataplex-lookup-context-tool/invoke",
+			api:            "http://127.0.0.1:5000/api/tool/my-knowledge-catalog-lookup-context-tool/invoke",
 			requestHeader:  map[string]string{},
 			requestBody:    bytes.NewBufferString(`{"resources":["projects/test-project/invalid-format"]}`),
 			wantStatusCode: 200,
@@ -892,7 +892,7 @@ func runDataplexLookupContextToolInvokeTest(t *testing.T, tableName string, data
 		},
 		{
 			name:           "Failure - Resources with different locations",
-			api:            "http://127.0.0.1:5000/api/tool/my-dataplex-lookup-context-tool/invoke",
+			api:            "http://127.0.0.1:5000/api/tool/my-knowledge-catalog-lookup-context-tool/invoke",
 			requestHeader:  map[string]string{},
 			requestBody:    bytes.NewBufferString(`{"resources":["projects/test-project/locations/us/entryGroups/g1/entries/e1", "projects/test-project/locations/europe-west1/entryGroups/g2/entries/e2"]}`),
 			wantStatusCode: 200,

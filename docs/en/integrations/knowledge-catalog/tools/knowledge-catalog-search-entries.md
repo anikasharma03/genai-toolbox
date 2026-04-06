@@ -1,17 +1,17 @@
 ---
-title: "dataplex-search-entries"
+title: "knowledge-catalog-search-entries"
 type: docs
 weight: 1
 description: >
-  A "dataplex-search-entries" tool allows to search for entries based on the provided query.
+  A "knowledge-catalog-search-entries" tool allows to search for entries based on the provided query.
 ---
 
 ## About
 
-A `dataplex-search-entries` tool returns all entries in Dataplex Catalog (e.g.
+A `knowledge-catalog-search-entries` tool returns all entries in Knowledge Catalog (e.g.
 tables, views, models) that matches given user query.
 
-`dataplex-search-entries` takes a required `query` parameter based on which
+`knowledge-catalog-search-entries` takes a required `query` parameter based on which
 entries are filtered and returned to the user. It also optionally accepts
 following parameters:
 
@@ -31,15 +31,15 @@ following parameters:
 
 ### IAM Permissions
 
-Dataplex uses [Identity and Access Management (IAM)][iam-overview] to control
-user and group access to Dataplex resources. Toolbox will use your
+Knowledge Catalog uses [Identity and Access Management (IAM)][iam-overview] to control
+user and group access to Knowledge Catalog resources. Toolbox will use your
 [Application Default Credentials (ADC)][adc] to authorize and authenticate when
-interacting with [Dataplex][dataplex-docs].
+interacting with [Knowledge Catalog][knowledge-catalog-docs].
 
 In addition to [setting the ADC for your server][set-adc], you need to ensure
 the IAM identity has been given the correct IAM permissions for the tasks you
-intend to perform. See [Dataplex Universal Catalog IAM permissions][iam-permissions]
-and [Dataplex Universal Catalog IAM roles][iam-roles] for more information on
+intend to perform. See [Knowledge Catalog IAM permissions][iam-permissions]
+and [Knowledge Catalog IAM roles][iam-roles] for more information on
 applying IAM permissions and roles to an identity.
 
 [iam-overview]: https://cloud.google.com/dataplex/docs/iam-and-access-control
@@ -47,15 +47,15 @@ applying IAM permissions and roles to an identity.
 [set-adc]: https://cloud.google.com/docs/authentication/provide-credentials-adc
 [iam-permissions]: https://cloud.google.com/dataplex/docs/iam-permissions
 [iam-roles]: https://cloud.google.com/dataplex/docs/iam-roles
-[dataplex-docs]: https://cloud.google.com/dataplex
+[knowledge-catalog-docs]: https://cloud.google.com/dataplex
 
 ## Example
 
 ```yaml
 kind: tool
-name: dataplex-search-entries
-type: dataplex-search-entries
-source: my-dataplex-source
+name: search_entries
+type: knowledge-catalog-search-entries
+source: my-knowledge-catalog-source
 description: Use this tool to get all the entries based on the provided query.
 ```
 
@@ -63,6 +63,6 @@ description: Use this tool to get all the entries based on the provided query.
 
 | **field**   | **type** | **required** | **description**                                    |
 |-------------|:--------:|:------------:|----------------------------------------------------|
-| type        |  string  |     true     | Must be "dataplex-search-entries".                 |
+| type        |  string  |     true     | Must be "knowledge-catalog-search-entries".        |
 | source      |  string  |     true     | Name of the source the tool should execute on.     |
 | description |  string  |     true     | Description of the tool that is passed to the LLM. |

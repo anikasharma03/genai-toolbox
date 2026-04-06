@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package dataplex
+package knowledgecatalog
 
 import (
 	"context"
@@ -31,7 +31,7 @@ import (
 	grpcstatus "google.golang.org/grpc/status"
 )
 
-const SourceType string = "dataplex"
+const SourceType string = "knowledge-catalog"
 
 // validate interface
 var _ sources.SourceConfig = Config{}
@@ -51,19 +51,19 @@ func newConfig(ctx context.Context, name string, decoder *yaml.Decoder) (sources
 }
 
 type Config struct {
-	// Dataplex configs
+	// Knowledge Catalog configs
 	Name    string `yaml:"name" validate:"required"`
 	Type    string `yaml:"type" validate:"required"`
 	Project string `yaml:"project" validate:"required"`
 }
 
 func (r Config) SourceConfigType() string {
-	// Returns Dataplex source type
+	// Returns Knowledge Catalog source type
 	return SourceType
 }
 
 func (r Config) Initialize(ctx context.Context, tracer trace.Tracer) (sources.Source, error) {
-	// Initializes a Dataplex source
+	// Initializes a Knowledge Catalog source
 	client, err := initDataplexConnection(ctx, tracer, r.Name, r.Project)
 	if err != nil {
 		return nil, err
@@ -84,7 +84,7 @@ type Source struct {
 }
 
 func (s *Source) SourceType() string {
-	// Returns Dataplex source type
+	// Returns Knowledge Catalog source type
 	return SourceType
 }
 
@@ -121,7 +121,7 @@ func initDataplexConnection(
 
 	client, err := dataplexapi.NewCatalogClient(ctx, option.WithUserAgent(userAgent), option.WithCredentials(cred))
 	if err != nil {
-		return nil, fmt.Errorf("failed to create Dataplex client for project %q: %w", project, err)
+		return nil, fmt.Errorf("failed to create Knowledge Catalog client for project %q: %w", project, err)
 	}
 	return client, nil
 }

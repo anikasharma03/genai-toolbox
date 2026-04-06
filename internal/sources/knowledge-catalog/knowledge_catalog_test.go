@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package dataplex_test
+package knowledgecatalog_test
 
 import (
 	"context"
@@ -21,11 +21,11 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/googleapis/mcp-toolbox/internal/server"
 	"github.com/googleapis/mcp-toolbox/internal/sources"
-	"github.com/googleapis/mcp-toolbox/internal/sources/dataplex"
+	"github.com/googleapis/mcp-toolbox/internal/sources/knowledge-catalog"
 	"github.com/googleapis/mcp-toolbox/internal/testutils"
 )
 
-func TestParseFromYamlDataplex(t *testing.T) {
+func TestParseFromYamlKnowledgeCatalog(t *testing.T) {
 	tcs := []struct {
 		desc string
 		in   string
@@ -36,13 +36,13 @@ func TestParseFromYamlDataplex(t *testing.T) {
 			in: `
 			kind: source
 			name: my-instance
-			type: dataplex
+			type: knowledge-catalog
 			project: my-project
 			`,
 			want: map[string]sources.SourceConfig{
-				"my-instance": dataplex.Config{
+				"my-instance": knowledgecatalog.Config{
 					Name:    "my-instance",
-					Type:    dataplex.SourceType,
+					Type:    knowledgecatalog.SourceType,
 					Project: "my-project",
 				},
 			},
@@ -73,20 +73,20 @@ func TestFailParseFromYaml(t *testing.T) {
 			in: `
 			kind: source
 			name: my-instance
-			type: dataplex
+			type: knowledge-catalog
 			project: my-project
 			foo: bar
 			`,
-			err: "error unmarshaling source: unable to parse source \"my-instance\" as \"dataplex\": [1:1] unknown field \"foo\"\n>  1 | foo: bar\n       ^\n   2 | name: my-instance\n   3 | project: my-project\n   4 | type: dataplex",
+			err: "error unmarshaling source: unable to parse source \"my-instance\" as \"knowledge-catalog\": [1:1] unknown field \"foo\"\n>  1 | foo: bar\n       ^\n   2 | name: my-instance\n   3 | project: my-project\n   4 | type: knowledge-catalog",
 		},
 		{
 			desc: "missing required field",
 			in: `
 			kind: source
 			name: my-instance
-			type: dataplex
+			type: knowledge-catalog
 			`,
-			err: "error unmarshaling source: unable to parse source \"my-instance\" as \"dataplex\": Key: 'Config.Project' Error:Field validation for 'Project' failed on the 'required' tag",
+			err: "error unmarshaling source: unable to parse source \"my-instance\" as \"knowledge-catalog\": Key: 'Config.Project' Error:Field validation for 'Project' failed on the 'required' tag",
 		},
 	}
 	for _, tc := range tcs {

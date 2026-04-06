@@ -1,17 +1,17 @@
 ---
-title: "dataplex-search-aspect-types"
+title: "knowledge-catalog-search-aspect-types"
 type: docs
 weight: 1
 description: >
-  A "dataplex-search-aspect-types" tool allows to to find aspect types relevant to the query.
+  A "knowledge-catalog-search-aspect-types" tool allows to to find aspect types relevant to the query.
 ---
 
 ## About
 
-A `dataplex-search-aspect-types` tool allows to fetch the metadata template of
+A `knowledge-catalog-search-aspect-types` tool allows to fetch the metadata template of
 aspect types based on search query.
 
-`dataplex-search-aspect-types` accepts following parameters optionally:
+`knowledge-catalog-search-aspect-types` accepts following parameters optionally:
 
 - `query` - Narrows down the search of aspect types to value of this parameter.
   If not provided, it fetches all aspect types available to the user.
@@ -28,15 +28,15 @@ aspect types based on search query.
 
 ### IAM Permissions
 
-Dataplex uses [Identity and Access Management (IAM)][iam-overview] to control
-user and group access to Dataplex resources. Toolbox will use your
+Knowledge Catalog uses [Identity and Access Management (IAM)][iam-overview] to control
+user and group access to Knowledge Catalog resources. Toolbox will use your
 [Application Default Credentials (ADC)][adc] to authorize and authenticate when
-interacting with [Dataplex][dataplex-docs].
+interacting with [Knowledge Catalog][knowledge-catalog-docs].
 
 In addition to [setting the ADC for your server][set-adc], you need to ensure
 the IAM identity has been given the correct IAM permissions for the tasks you
-intend to perform. See [Dataplex Universal Catalog IAM permissions][iam-permissions]
-and [Dataplex Universal Catalog IAM roles][iam-roles] for more information on
+intend to perform. See [Knowledge Catalog IAM permissions][iam-permissions]
+and [Knowledge Catalog IAM roles][iam-roles] for more information on
 applying IAM permissions and roles to an identity.
 
 [iam-overview]: https://cloud.google.com/dataplex/docs/iam-and-access-control
@@ -44,15 +44,15 @@ applying IAM permissions and roles to an identity.
 [set-adc]: https://cloud.google.com/docs/authentication/provide-credentials-adc
 [iam-permissions]: https://cloud.google.com/dataplex/docs/iam-permissions
 [iam-roles]: https://cloud.google.com/dataplex/docs/iam-roles
-[dataplex-docs]: https://cloud.google.com/dataplex
+[knowledge-catalog-docs]: https://cloud.google.com/dataplex
 
 ## Example
 
 ```yaml
 kind: tool
-name: dataplex-search-aspect-types
-type: dataplex-search-aspect-types
-source: my-dataplex-source
+name: search_aspect_types
+type: knowledge-catalog-search-aspect-types
+source: my-knowledge-catalog-source
 description: Use this tool to find aspect types relevant to the query.
 ```
 
@@ -60,6 +60,6 @@ description: Use this tool to find aspect types relevant to the query.
 
 | **field**   | **type** | **required** | **description**                                    |
 |-------------|:--------:|:------------:|----------------------------------------------------|
-| type        |  string  |     true     | Must be "dataplex-search-aspect-types".            |
+| type        |  string  |     true     | Must be "knowledge-catalog-search-aspect-types".   |
 | source      |  string  |     true     | Name of the source the tool should execute on.     |
 | description |  string  |     true     | Description of the tool that is passed to the LLM. |

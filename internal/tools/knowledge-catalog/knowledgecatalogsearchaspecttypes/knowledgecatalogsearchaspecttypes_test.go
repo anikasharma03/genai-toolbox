@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package dataplexlookupentry_test
+package knowledgecatalogsearchaspecttypes_test
 
 import (
 	"testing"
@@ -20,10 +20,10 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/googleapis/mcp-toolbox/internal/server"
 	"github.com/googleapis/mcp-toolbox/internal/testutils"
-	"github.com/googleapis/mcp-toolbox/internal/tools/dataplex/dataplexlookupentry"
+	"github.com/googleapis/mcp-toolbox/internal/tools/knowledge-catalog/knowledgecatalogsearchaspecttypes"
 )
 
-func TestParseFromYamlDataplexLookupEntry(t *testing.T) {
+func TestParseFromYamlKnowledgeCatalogSearchAspectTypes(t *testing.T) {
 	ctx, err := testutils.ContextWithNewLogger()
 	if err != nil {
 		t.Fatalf("unexpected error: %s", err)
@@ -36,16 +36,16 @@ func TestParseFromYamlDataplexLookupEntry(t *testing.T) {
 		{
 			desc: "basic example",
 			in: `
-            kind: tool
-            name: example_tool
-            type: dataplex-lookup-entry
-            source: my-instance
-            description: some description
-            `,
+		            kind: tool
+		            name: example_tool
+		            type: knowledge-catalog-search-aspect-types
+		            source: my-instance
+		            description: some description
+		            `,
 			want: server.ToolConfigs{
-				"example_tool": dataplexlookupentry.Config{
+				"example_tool": knowledgecatalogsearchaspecttypes.Config{
 					Name:         "example_tool",
-					Type:         "dataplex-lookup-entry",
+					Type:         "knowledge-catalog-search-aspect-types",
 					Source:       "my-instance",
 					Description:  "some description",
 					AuthRequired: []string{},

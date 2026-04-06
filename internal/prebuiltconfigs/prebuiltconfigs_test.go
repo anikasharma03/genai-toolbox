@@ -39,7 +39,7 @@ var expectedToolSources = []string{
 	"cloud-sql-postgres-admin",
 	"cloud-sql-postgres-observability",
 	"cloud-sql-postgres",
-	"dataplex",
+	"knowledge-catalog",
 	"dataproc",
 	"firestore",
 	"elasticsearch",
@@ -125,7 +125,7 @@ func TestGetPrebuiltTool(t *testing.T) {
 	cloudsqlmysql_config := getOrFatal(t, "cloud-sql-mysql")
 	cloudsqlmssql_observability_config := getOrFatal(t, "cloud-sql-mssql-observability")
 	cloudsqlmssql_config := getOrFatal(t, "cloud-sql-mssql")
-	dataplex_config := getOrFatal(t, "dataplex")
+	knowledge_catalog_config := getOrFatal(t, "knowledge-catalog")
 	firestoreconfig := getOrFatal(t, "firestore")
 	looker_config := getOrFatal(t, "looker")
 	lookerca_config := getOrFatal(t, "looker-conversational-analytics")
@@ -191,8 +191,8 @@ func TestGetPrebuiltTool(t *testing.T) {
 	if len(cloudsqlmssql_config) <= 0 {
 		t.Fatalf("unexpected error: could not fetch cloud sql mssql prebuilt tools yaml")
 	}
-	if len(dataplex_config) <= 0 {
-		t.Fatalf("unexpected error: could not fetch dataplex prebuilt tools yaml")
+	if len(knowledge_catalog_config) <= 0 {
+		t.Fatalf("unexpected error: could not fetch knowledge-catalog prebuilt tools yaml")
 	}
 	if len(firestoreconfig) <= 0 {
 		t.Fatalf("unexpected error: could not fetch firestore prebuilt tools yaml")

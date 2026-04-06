@@ -13,26 +13,26 @@
 # limitations under the License.
 
 sources:
-  dataplex-source:
-    kind: "dataplex"
+  knowledge-catalog-source:
+    kind: "knowledge-catalog"
     project: ${DATAPLEX_PROJECT}
 
 tools:
   search_entries:
-    kind: dataplex-search-entries
-    source: dataplex-source
+    kind: knowledge-catalog-search-entries
+    source: knowledge-catalog-source
     description: Searches for data assets (eg. table/dataset/view) in Catalog based on the provided search query.
   lookup_entry:
-    kind: dataplex-lookup-entry
-    source: dataplex-source
+    kind: knowledge-catalog-lookup-entry
+    source: knowledge-catalog-source
     description: Retrieves a specific metadata regarding a data asset (e.g. table/dataset/view) from Catalog
   search_aspect_types:
-    kind: dataplex-search-aspect-types
-    source: dataplex-source
+    kind: knowledge-catalog-search-aspect-types
+    source: knowledge-catalog-source
     description: Search aspect types relevant to the query.
   lookup_context:
-    kind: dataplex-lookup-context
-    source: dataplex-source
+    kind: knowledge-catalog-lookup-context
+    source: knowledge-catalog-source
     description: Retrieves rich metadata regarding one or more data assets along with their relationships.
 
 toolsets:

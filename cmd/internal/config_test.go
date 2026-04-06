@@ -1429,7 +1429,7 @@ func TestPrebuiltTools(t *testing.T) {
 	cloudsqlmysql_admin_config, _ := prebuiltconfigs.Get("cloud-sql-mysql-admin")
 	cloudsqlmssql_config, _ := prebuiltconfigs.Get("cloud-sql-mssql")
 	cloudsqlmssql_admin_config, _ := prebuiltconfigs.Get("cloud-sql-mssql-admin")
-	dataplex_config, _ := prebuiltconfigs.Get("dataplex")
+	knowledge_catalog_config, _ := prebuiltconfigs.Get("knowledge-catalog")
 	firestoreconfig, _ := prebuiltconfigs.Get("firestore")
 	mysql_config, _ := prebuiltconfigs.Get("mysql")
 	mssql_config, _ := prebuiltconfigs.Get("mssql")
@@ -1794,8 +1794,8 @@ func TestPrebuiltTools(t *testing.T) {
 			},
 		},
 		{
-			name: "dataplex prebuilt tools",
-			in:   dataplex_config,
+			name: "knowledge catalog prebuilt tools",
+			in:   knowledge_catalog_config,
 			wantToolset: server.ToolsetConfigs{
 				"discovery": tools.ToolsetConfig{
 					Name:      "discovery",

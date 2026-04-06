@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package dataplexsearchentries
+package knowledgecatalogsearchentries
 
 import (
 	"context"
@@ -28,7 +28,7 @@ import (
 	"github.com/googleapis/mcp-toolbox/internal/util/parameters"
 )
 
-const resourceType string = "dataplex-search-entries"
+const resourceType string = "knowledge-catalog-search-entries"
 
 func init() {
 	if !tools.Register(resourceType, newConfig) {
@@ -66,7 +66,7 @@ func (cfg Config) ToolConfigType() string {
 
 func (cfg Config) Initialize(srcs map[string]sources.Source) (tools.Tool, error) {
 	query := parameters.NewStringParameter("query",
-		"A query string for searching entries, following Dataplex search syntax. "+
+		"A query string for searching entries, following Knowledge Catalog(formerly known as Dataplex) search syntax. "+
 			"Supports logical operators (AND, OR, NOT) and grouping. "+
 			"For example, to find a table that might have been renamed, you could use 'type:table (name:books OR fiction)'. "+
 			"This can be more efficient than multiple separate calls."+
