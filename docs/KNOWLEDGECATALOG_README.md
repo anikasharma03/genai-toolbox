@@ -58,7 +58,7 @@ The Knowledge Catalog MCP server provides the following tools:
 The MCP server is configured using environment variables.
 
 ```bash
-export DATAPLEX_PROJECT="<your-gcp-project-id>"
+export KNOWLEDGE_CATALOG_PROJECT="<your-gcp-project-id>"
 ```
 
 Add the following configuration to your MCP client (e.g., `settings.json` for Gemini CLI, `mcp_config.json` for Antigravity):
@@ -70,7 +70,7 @@ Add the following configuration to your MCP client (e.g., `settings.json` for Ge
       "command": "npx",
       "args": ["-y", "@toolbox-sdk/server", "--prebuilt", "knowledge-catalog", "--stdio"],
       "env": {
-        "DATAPLEX_PROJECT": "your-project-id"
+        "KNOWLEDGE_CATALOG_PROJECT": "your-project-id"
       }
     }
   }

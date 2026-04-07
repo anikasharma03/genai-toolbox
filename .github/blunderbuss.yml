@@ -44,7 +44,7 @@ assign_issues_by:
     to:
     - 'googleapis/toolbox-cloud-sql-postgres-team'
   - labels:
-    - 'product: dataplex'
+    - 'product: knowledge-catalog'
     to:
     - 'googleapis/toolbox-dataplex-team'
   - labels:

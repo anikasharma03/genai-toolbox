@@ -15,7 +15,7 @@
 sources:
   knowledge-catalog-source:
     kind: "knowledge-catalog"
-    project: ${DATAPLEX_PROJECT}
+    project: ${KNOWLEDGE_CATALOG_PROJECT}
 
 tools:
   search_entries:

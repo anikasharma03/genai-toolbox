@@ -8,7 +8,7 @@ description: "Details of the Knowledge Catalog(formerly known as Dataplex) prebu
 
 *   `--prebuilt` value: `knowledge-catalog`
 *   **Environment Variables:**
-    *   `DATAPLEX_PROJECT`: The GCP project ID.
+    *   `KNOWLEDGE_CATALOG_PROJECT`: The GCP project ID.
 *   **Permissions:**
     *   **Knowledge Catalog Reader** (`roles/dataplex.viewer`) to search and look up
         entries.

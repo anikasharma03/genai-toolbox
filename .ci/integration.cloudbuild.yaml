@@ -330,7 +330,7 @@ steps:
     entrypoint: /bin/bash
     env:
       - "GOPATH=/gopath"
-      - "DATAPLEX_PROJECT=$PROJECT_ID"
+      - "KNOWLEDGE_CATALOG_PROJECT=$PROJECT_ID"
       - "SERVICE_ACCOUNT_EMAIL=$SERVICE_ACCOUNT_EMAIL"
     secretEnv: ["CLIENT_ID"]
     volumes:

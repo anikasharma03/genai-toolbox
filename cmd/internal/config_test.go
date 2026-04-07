@@ -1456,7 +1456,7 @@ func TestPrebuiltTools(t *testing.T) {
 	t.Setenv("API_KEY", "your_api_key")
 
 	t.Setenv("BIGQUERY_PROJECT", "your_gcp_project_id")
-	t.Setenv("DATAPLEX_PROJECT", "your_gcp_project_id")
+	t.Setenv("KNOWLEDGE_CATALOG_PROJECT", "your_gcp_project_id")
 	t.Setenv("FIRESTORE_PROJECT", "your_gcp_project_id")
 	t.Setenv("FIRESTORE_DATABASE", "your_firestore_db_name")
 

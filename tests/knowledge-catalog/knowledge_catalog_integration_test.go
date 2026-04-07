@@ -45,13 +45,13 @@ var (
 	KnowledgeCatalogSearchEntriesToolType     = "knowledge-catalog-search-entries"
 	KnowledgeCatalogLookupEntryToolType       = "knowledge-catalog-lookup-entry"
 	KnowledgeCatalogSearchAspectTypesToolType = "knowledge-catalog-search-aspect-types"
-	KnowledgeCatalogProject                   = os.Getenv("DATAPLEX_PROJECT")
+	KnowledgeCatalogProject                   = os.Getenv("KNOWLEDGE_CATALOG_PROJECT")
 )
 
 func getKnowledgeCatalogVars(t *testing.T) map[string]any {
 	switch "" {
 	case KnowledgeCatalogProject:
-		t.Fatal("'DATAPLEX_PROJECT' not set")
+		t.Fatal("'KNOWLEDGE_CATALOG_PROJECT' not set")
 	}
 	return map[string]any{
 		"type":    KnowledgeCatalogSourceType,

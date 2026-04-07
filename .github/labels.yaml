@@ -120,9 +120,9 @@
 - name: 'product: couchbase'
   color: 5065c7
   description: 'Couchbase'
-- name: 'product: dataplex'
+- name: 'product: knowledge-catalog'
   color: 5065c7
-  description: 'Dataplex'
+  description: 'Knowledge Catalog'
 - name: 'product: dgraph'
   color: 5065c7
   description: 'Dgraph'
