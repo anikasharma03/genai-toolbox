@@ -3,7 +3,7 @@ title: "knowledge-catalog-search-aspect-types"
 type: docs
 weight: 1
 description: >
-  A "knowledge-catalog-search-aspect-types" tool allows to to find aspect types relevant to the query.
+  A "knowledge-catalog-search-aspect-types" tool allows to find aspect types relevant to the query.
 ---
 
 ## About

@@ -8,7 +8,7 @@ description: >
 
 ## About
 
-A `knowledge-catalog-search-entries` tool returns all entries in Knowledge Catalog (e.g.
+A `knowledge-catalog-search-entries` tool returns all entries in Knowledge Catalog (formerly known as Dataplex) (e.g.
 tables, views, models) that matches given user query.
 
 `knowledge-catalog-search-entries` takes a required `query` parameter based on which
