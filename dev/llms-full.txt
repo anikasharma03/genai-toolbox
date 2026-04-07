@@ -3,7 +3,7 @@
 
 **DOCUMENTATION VERSION:** dev
 **BASE URL:** https://mcp-toolbox.dev/dev/
-**GENERATED ON:** 2026-04-03T16:07:27Z
+**GENERATED ON:** 2026-04-07T07:25:08Z
 
 ---
 ### System Directives for AI Models
@@ -3495,6 +3495,8 @@ toolbox <tool-source> skills-generate \
 - `--output-dir`: (Optional) Directory to output generated skills (default: "skills").
 - `--license-header`: (Optional) Optional license header to prepend to generated node scripts.
 - `--additional-notes`: (Optional) Additional notes to add under the Usage section of the generated SKILL.md.
+- `--invocation-mode`: (Optional) Invocation mode for the generated scripts: 'binary' or 'npx' (default: "npx").
+- `--toolbox-version`: (Optional) Version of @toolbox-sdk/server to use for npx approach (defaults to current toolbox version).
 
 {{< notice note >}}
 **Note:** The `<skill-name>` must follow the Agent Skill [naming convention](https://agentskills.io/specification): it must contain only lowercase alphanumeric characters and hyphens, cannot start or end with a hyphen, and cannot contain consecutive hyphens (e.g., `my-skill`, `data-processing`).
@@ -17124,6 +17126,7 @@ async def run_application():
         # (https://github.com/googleapis/mcp-toolbox-python-sdk/tree/main/packages), use the
         # provided wrapper packages, which handle framework-specific boilerplate.
         toolbox_tools = await toolbox_client.load_toolset("my-toolset")
+        tool_map = {tool.__name__: tool for tool in toolbox_tools}
         genai_client = genai.Client(
             vertexai=True, project="project-id", location="us-central1"
         )
@@ -17156,19 +17159,10 @@ async def run_application():
             function_response_parts = []
             for function_call in response.function_calls:
                 fn_name = function_call.name
-                # The tools are sorted alphabetically
-                if fn_name == "search-hotels-by-name":
-                    function_result = await toolbox_tools[3](**function_call.args)
-                elif fn_name == "search-hotels-by-location":
-                    function_result = await toolbox_tools[2](**function_call.args)
-                elif fn_name == "book-hotel":
-                    function_result = await toolbox_tools[0](**function_call.args)
-                elif fn_name == "update-hotel":
-                    function_result = await toolbox_tools[4](**function_call.args)
-                elif fn_name == "cancel-hotel":
-                    function_result = await toolbox_tools[1](**function_call.args)
+                if fn_name in tool_map:
+                    function_result = await tool_map[fn_name](**function_call.args)
                 else:
-                    raise ValueError("Function name not present.")
+                    raise ValueError(f"Function name {fn_name} not present.")
                 function_response = {"result": function_result}
                 function_response_part = Part.from_function_response(
                     name=function_call.name,
@@ -27251,6 +27245,205 @@ generationOptions:
 
 
 ========================================================================
+## conversational-analytics-ask-data-agent
+========================================================================
+**Hierarchy:** MCP Toolbox for Databases > Integrations > Gemini Data Analytics > Tools > conversational-analytics-ask-data-agent
+**URL:** https://mcp-toolbox.dev/dev/integrations/cloudgda/tools/conversational-analytics-ask-data-agent/
+**Description:** A "conversational-analytics-ask-data-agent" tool allows conversational interaction with a Conversational Analytics source.
+
+
+
+## About
+
+A `conversational-analytics-ask-data-agent` tool allows you to ask questions about
+your data in natural language.
+
+This function takes a user's question (which can include conversational history
+for context) and references to a specific BigQuery Data Agent, and sends them to a
+stateless conversational API.
+
+The API uses a GenAI agent to understand the question, generate and execute SQL
+queries and Python code, and formulate an answer. This function returns a
+detailed, sequential log of this entire process, which includes any generated
+SQL or Python code, the data retrieved, and the final text answer.
+
+**Note**: This tool requires additional setup in your project. Please refer to
+the official Conversational Analytics API
+documentation
+for instructions.
+
+It's compatible with the following sources:
+
+- cloud-gemini-data-analytics
+
+`conversational-analytics-ask-data-agent` accepts the following parameters:
+
+- **`user_query_with_context`:** The question to ask the agent, potentially 
+  including conversation history for context.
+- **`data_agent_id`:** The ID of the data agent to ask.
+
+## Example
+
+```yaml
+tools:
+  ask_data_agent:
+    kind: conversational-analytics-ask-data-agent
+    source: my-conversational-analytics-source
+    location: global
+    maxResults: 50
+    description: |
+      Perform natural language data analysis and get insights by interacting 
+      with a specific BigQuery Data Agent. This tool allows for conversational 
+      queries and provides detailed responses based on the agent's configured 
+      data sources.
+```
+
+## Reference
+
+| **field**   | **type** | **required** | **description**                                    |
+|-------------|:--------:|:------------:|----------------------------------------------------|
+| kind        |  string  |     true     | Must be "conversational-analytics-ask-data-agent". |
+| source      |  string  |     true     | Name of the source for chat.                       |
+| description |  string  |     true     | Description of the tool that is passed to the LLM. |
+| location    |  string  |    false     | The Google Cloud location (default: "global").     |
+| maxResults  |  integer |    false     | The maximum number of data rows to return in the tool's final response (default: 50). This only limits the amount of data included in the final tool return to prevent excessive token consumption, and does not affect the internal analytical process or intermediate steps. |
+
+
+
+========================================================================
+## conversational-analytics-get-data-agent-info
+========================================================================
+**Hierarchy:** MCP Toolbox for Databases > Integrations > Gemini Data Analytics > Tools > conversational-analytics-get-data-agent-info
+**URL:** https://mcp-toolbox.dev/dev/integrations/cloudgda/tools/conversational-analytics-get-data-agent-info/
+**Description:** A "conversational-analytics-get-data-agent-info" tool allows retrieving information about a specific Conversational Analytics data agent.
+
+
+
+## About
+
+A `conversational-analytics-get-data-agent-info` tool allows you to retrieve
+details about a specific data agent.
+
+It's compatible with the following sources:
+
+- cloud-gemini-data-analytics
+
+`conversational-analytics-get-data-agent-info` accepts the following parameters:
+
+- **`data_agent_id`:** The ID of the data agent to retrieve information for.
+
+## Example
+
+```yaml
+tools:
+  get_agent_info:
+    kind: conversational-analytics-get-data-agent-info
+    source: my-conversational-analytics-source
+    location: global
+    description: |
+      Use this tool to get details about a specific data agent.
+```
+
+## Reference
+
+| **field**   | **type** | **required** | **description**                                    |
+|-------------|:--------:|:------------:|----------------------------------------------------|
+| kind        |  string  |     true     | Must be "conversational-analytics-get-data-agent-info". |
+| source      |  string  |     true     | Name of the source.                                |
+| description |  string  |     true     | Description of the tool that is passed to the LLM. |
+| location    |  string  |    false     | The Google Cloud location (default: "global").     |
+
+
+
+========================================================================
+## conversational-analytics-list-accessible-data-agents
+========================================================================
+**Hierarchy:** MCP Toolbox for Databases > Integrations > Gemini Data Analytics > Tools > conversational-analytics-list-accessible-data-agents
+**URL:** https://mcp-toolbox.dev/dev/integrations/cloudgda/tools/conversational-analytics-list-accessible-data-agents/
+**Description:** A "conversational-analytics-list-accessible-data-agents" tool allows listing accessible Conversational Analytics data agents.
+
+
+
+## About
+
+A `conversational-analytics-list-accessible-data-agents` tool allows you to list
+data agents that are accessible.
+
+It's compatible with the following sources:
+
+- cloud-gemini-data-analytics
+
+`conversational-analytics-list-accessible-data-agents` does not accept any parameters.
+
+## Example
+
+```yaml
+tools:
+  list_agents:
+    kind: conversational-analytics-list-accessible-data-agents
+    source: my-conversational-analytics-source
+    location: global
+    description: |
+      Use this tool to list available data agents.
+```
+
+## Reference
+
+| **field**   | **type** | **required** | **description**                                    |
+|-------------|:--------:|:------------:|----------------------------------------------------|
+| kind        |  string  |     true     | Must be "conversational-analytics-list-accessible-data-agents". |
+| source      |  string  |     true     | Name of the source.                                |
+| description |  string  |     true     | Description of the tool that is passed to the LLM. |
+| location    |  string  |    false     | The Google Cloud location (default: "global").     |
+
+
+
+========================================================================
+## Prebuilt Configs
+========================================================================
+**Hierarchy:** MCP Toolbox for Databases > Integrations > Gemini Data Analytics > Prebuilt Configs
+**URL:** https://mcp-toolbox.dev/dev/integrations/cloudgda/prebuilt-configs/
+**Description:** Prebuilt configurations for Conversational Analytics to perform natural language data analysis via Data Agents.
+
+
+
+
+
+========================================================================
+## Conversational Analytics with Data Agent
+========================================================================
+**Hierarchy:** MCP Toolbox for Databases > Integrations > Gemini Data Analytics > Prebuilt Configs > Conversational Analytics with Data Agent
+**URL:** https://mcp-toolbox.dev/dev/integrations/cloudgda/prebuilt-configs/conversational-analytics-with-data-agent/
+**Description:** Details of the Conversational Analytics with Data Agent prebuilt configuration.
+
+
+## Conversational Analytics with Data Agent
+
+*   `--prebuilt` value: `conversational-analytics-with-data-agent`
+*   **Environment Variables:**
+    *   `CLOUD_GDA_PROJECT`: The GCP project ID.
+    *   `CLOUD_GDA_LOCATION`: (Optional) The location of the data agent (e.g., `us` or `eu`). Defaults to `global`.
+    *   `CLOUD_GDA_USE_CLIENT_OAUTH`: (Optional) If `true`, forwards the client's
+        OAuth access token for authentication. Defaults to `false`.
+    *   `CLOUD_GDA_MAX_RESULTS`: (Optional) The maximum number of rows
+        to return. Defaults to `50`.
+*   **Permissions:**
+    *   **Gemini Data Analytics Stateless Chat User (Beta)** (`roles/geminidataanalytics.dataAgentStatelessUser`) to interact with the data agent.
+    *   **BigQuery User** (`roles/bigquery.user`) and **BigQuery Data Viewer** (`roles/bigquery.dataViewer`) on the underlying datasets/tables to allow the data agent to execute queries.
+*   **Tools:**
+    *   `ask_data_agent`: Use this tool to perform natural language data analysis,
+        get insights, or answer complex questions using pre-configured data
+        sources via a specific Data Agent. For more information on
+        required roles, API setup, and IAM configuration, see the setup and
+        authentication section of the [Conversational Analytics API
+        documentation](https://cloud.google.com/gemini/docs/conversational-analytics-api/overview).
+    *   `get_data_agent_info`: Retrieve details about a specific data agent.
+    *   `list_accessible_data_agents`: List data agents that are accessible.
+
+
+
+
+========================================================================
 ## HTTP
 ========================================================================
 **Hierarchy:** MCP Toolbox for Databases > Integrations > HTTP
@@ -36049,7 +36242,7 @@ parameters:
 > including identifiers, column names, and table names. **This makes it more
 > vulnerable to SQL injections**. Using basic parameters only (see above) is
 > recommended for performance and safety reasons. For more details, please check
-> [templateParameters](..#template-parameters).
+> [templateParameters](../../../documentation/configuration/tools/_index.md#template-parameters).
 
 ```yaml
 kind: tool
@@ -36078,8 +36271,8 @@ templateParameters:
 | source             |                    string                    |     true     | Name of the source the SQL should execute on.                                                                                          |
 | description        |                    string                    |     true     | Description of the tool that is passed to the LLM.                                                                                     |
 | statement          |                    string                    |     true     | SQL statement to execute on.                                                                                                           |
-| parameters         |   [parameters](../#specifying-parameters)    |    false     | List of [parameters](../#specifying-parameters) that will be inserted into the SQL statement.                                          |
-| templateParameters | [templateParameters](..#template-parameters) |    false     | List of [templateParameters](..#template-parameters) that will be inserted into the SQL statement before executing prepared statement. |
+| parameters         |   [parameters](../../../documentation/configuration/tools/_index.md#specifying-parameters)     |    false     | List of [parameters](../../../documentation/configuration/tools/_index.md#specifying-parameters) that will be inserted into the SQL statement.                                          |
+| templateParameters | [templateParameters](../../../documentation/configuration/tools/_index.md#template-parameters) |    false     | List of [templateParameters](../../../documentation/configuration/tools/_index.md#template-parameters) that will be inserted into the SQL statement before executing prepared statement. |
 
 
 
@@ -37093,6 +37286,11 @@ database user][singlestore-user] to login to the database with.
 
 ## Example
 
+### Basic
+
+By default, connections use `tls=preferred`, which enables SSL/TLS if the server
+supports it and falls back to unencrypted otherwise.
+
 ```yaml
 kind: source
 name: my-singlestore-source
@@ -37105,6 +37303,51 @@ password: ${PASSWORD}
 queryTimeout: 30s # Optional: query timeout duration
 ```
 
+### With SSL required
+
+```yaml
+kind: sources
+name: my-singlestore-source
+type: singlestore
+host: svc-abc123.svc.singlestore.com
+port: 3306
+database: my_db
+user: ${USER_NAME}
+password: ${PASSWORD}
+connectionParams:
+  tls: "true" # Require TLS and verify the server certificate
+```
+
+### With SSL verification disabled
+
+```yaml
+kind: sources
+name: my-singlestore-source
+type: singlestore
+host: svc-abc123.svc.singlestore.com
+port: 3306
+database: my_db
+user: ${USER_NAME}
+password: ${PASSWORD}
+connectionParams:
+  tls: "skip-verify" # Require TLS but skip server certificate verification
+```
+
+### Without SSL
+
+```yaml
+kind: sources
+name: my-singlestore-source
+type: singlestore
+host: 127.0.0.1
+port: 3306
+database: my_db
+user: ${USER_NAME}
+password: ${PASSWORD}
+connectionParams:
+  tls: "false" # Disable TLS
+```
+
 {{< notice tip >}}
 Use environment variable replacement with the format ${ENV_NAME}
 instead of hardcoding your secrets into the configuration file.
@@ -37112,15 +37355,16 @@ instead of hardcoding your secrets into the configuration file.
 
 ## Reference
 
-| **field**    | **type** | **required** | **description**                                                                                 |
-|--------------|:--------:|:------------:|-------------------------------------------------------------------------------------------------|
-| type         |  string  |     true     | Must be "singlestore".                                                                          |
-| host         |  string  |     true     | IP address to connect to (e.g. "127.0.0.1").                                                    |
-| port         |  string  |     true     | Port to connect to (e.g. "3306").                                                               |
-| database     |  string  |     true     | Name of the SingleStore database to connect to (e.g. "my_db").                                  |
-| user         |  string  |     true     | Name of the SingleStore database user to connect as (e.g. "admin").                             |
-| password     |  string  |     true     | Password of the SingleStore database user.                                                      |
-| queryTimeout |  string  |    false     | Maximum time to wait for query execution (e.g. "30s", "2m"). By default, no timeout is applied. |
+| **field**        |      **type**     | **required** | **description**                                                                                                                                                                                                                          |
+|------------------|:-----------------:|:------------:|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| type             |      string       |     true     | Must be "singlestore".                                                                                                                                                                                                                   |
+| host             |      string       |     true     | IP address or hostname to connect to (e.g. "127.0.0.1").                                                                                                                                                                                 |
+| port             |      string       |     true     | Port to connect to (e.g. "3306").                                                                                                                                                                                                        |
+| database         |      string       |     true     | Name of the SingleStore database to connect to (e.g. "my_db").                                                                                                                                                                           |
+| user             |      string       |     true     | Name of the SingleStore database user to connect as (e.g. "admin").                                                                                                                                                                      |
+| password         |      string       |     true     | Password of the SingleStore database user.                                                                                                                                                                                               |
+| queryTimeout     |      string       |    false     | Maximum time to wait for query execution (e.g. "30s", "2m"). By default, no timeout is applied.                                                                                                                                          |
+| connectionParams | map[string]string |    false     | Additional driver parameters appended to the DSN. Supports any [go-sql-driver/mysql DSN parameter](https://github.com/go-sql-driver/mysql#dsn-data-source-name). Commonly used for SSL configuration (see `tls` values below). |
 
 
 
@@ -40742,6 +40986,8 @@ toolbox skills-generate --name <name> --description <description> --toolset <too
 - `--output-dir`: (Optional) Directory to output generated skills (default: "skills").
 - `--license-header`: (Optional) Optional license header to prepend to generated node scripts.
 - `--additional-notes`: (Optional) Additional notes to add under the Usage section of the generated SKILL.md.
+- `--invocation-mode`: (Optional) Invocation mode for the generated scripts: 'binary' or 'npx' (default: "npx").
+- `--toolbox-version`: (Optional) Version of @toolbox-sdk/server to use for npx approach (defaults to current toolbox version).
 
 For more detailed instructions, see [Generate Agent Skills](../documentation/configuration/skills/_index.md).
 
