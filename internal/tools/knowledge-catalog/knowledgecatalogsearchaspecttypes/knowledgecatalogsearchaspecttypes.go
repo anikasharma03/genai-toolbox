@@ -34,6 +34,9 @@ func init() {
 	if !tools.Register(resourceType, newConfig) {
 		panic(fmt.Sprintf("tool type %q already registered", resourceType))
 	}
+	if !tools.Register("dataplex-search-aspect-types", newConfig) {
+		panic(fmt.Sprintf("tool type %q already registered", "dataplex-search-aspect-types"))
+	}
 }
 
 func newConfig(ctx context.Context, name string, decoder *yaml.Decoder) (tools.ToolConfig, error) {
@@ -65,6 +68,7 @@ func (cfg Config) ToolConfigType() string {
 }
 
 func (cfg Config) Initialize(srcs map[string]sources.Source) (tools.Tool, error) {
+	cfg.Type = cfg.ToolConfigType()
 	query := parameters.NewStringParameter("query", "The query against which aspect type should be matched.")
 	pageSize := parameters.NewIntParameterWithDefault("pageSize", 5, "Number of returned aspect types in the search page.")
 	orderBy := parameters.NewStringParameterWithDefault("orderBy", "relevance", "Specifies the ordering of results. Supported values are: relevance, last_modified_timestamp, last_modified_timestamp asc")

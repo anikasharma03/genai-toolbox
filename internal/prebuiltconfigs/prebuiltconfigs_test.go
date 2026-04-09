@@ -27,6 +27,7 @@ var expectedToolSources = []string{
 	"alloydb-postgres-observability",
 	"alloydb-postgres",
 	"conversational-analytics-with-data-agent",
+	"dataplex",
 	"bigquery",
 	"clickhouse",
 	"cloud-healthcare",
@@ -75,7 +76,12 @@ func TestGetPrebuiltSources(t *testing.T) {
 
 func TestLoadPrebuiltToolYAMLs(t *testing.T) {
 	test_name := "test load prebuilt configs"
-	expectedKeys := expectedToolSources
+	var expectedKeys []string
+	for _, k := range expectedToolSources {
+		if k != "dataplex" {
+			expectedKeys = append(expectedKeys, k)
+		}
+	}
 	t.Run(test_name, func(t *testing.T) {
 		configsMap, keys, err := loadPrebuiltToolYAMLs()
 		if err != nil {

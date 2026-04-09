@@ -35,6 +35,9 @@ func init() {
 	if !tools.Register(resourceType, newConfig) {
 		panic(fmt.Sprintf("tool type %q already registered", resourceType))
 	}
+	if !tools.Register("dataplex-lookup-entry", newConfig) {
+		panic(fmt.Sprintf("tool type %q already registered", "dataplex-lookup-entry"))
+	}
 }
 
 func newConfig(ctx context.Context, name string, decoder *yaml.Decoder) (tools.ToolConfig, error) {
@@ -67,6 +70,7 @@ func (cfg Config) ToolConfigType() string {
 }
 
 func (cfg Config) Initialize(srcs map[string]sources.Source) (tools.Tool, error) {
+	cfg.Type = cfg.ToolConfigType()
 	viewDesc := `
 				## Argument: view
 

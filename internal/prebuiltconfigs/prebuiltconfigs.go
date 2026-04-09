@@ -37,6 +37,12 @@ func init() {
 	if err != nil {
 		panic(fmt.Sprintf("Unexpected Error: %v\n", err))
 	}
+
+	// Alias 'dataplex' to 'knowledge-catalog' for backward compatibility
+	if content, ok := prebuiltToolYAMLs["knowledge-catalog"]; ok {
+		prebuiltToolYAMLs["dataplex"] = content
+		prebuiltToolsSources = append(prebuiltToolsSources, "dataplex")
+	}
 }
 
 // Getter for the prebuiltToolsSources

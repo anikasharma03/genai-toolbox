@@ -35,6 +35,9 @@ func init() {
 	if !tools.Register(resourceType, newConfig) {
 		panic(fmt.Sprintf("tool type %q already registered", resourceType))
 	}
+	if !tools.Register("dataplex-lookup-context", newConfig) {
+		panic(fmt.Sprintf("tool type %q already registered", "dataplex-lookup-context"))
+	}
 }
 
 func newConfig(ctx context.Context, name string, decoder *yaml.Decoder) (tools.ToolConfig, error) {
@@ -68,6 +71,7 @@ func (cfg Config) ToolConfigType() string {
 }
 
 func (cfg Config) Initialize(srcs map[string]sources.Source) (tools.Tool, error) {
+	cfg.Type = cfg.ToolConfigType()
 	resources := parameters.NewArrayParameter("resources",
 		"Required. A list of up to 10 resource names. Resources may belong to different projects, but all must belong to the same location.",
 		parameters.NewStringParameter("resource",

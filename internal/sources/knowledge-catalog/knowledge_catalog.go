@@ -17,6 +17,7 @@ package knowledgecatalog
 import (
 	"context"
 	"fmt"
+	"os"
 
 	dataplexapi "cloud.google.com/go/dataplex/apiv1"
 	"cloud.google.com/go/dataplex/apiv1/dataplexpb"
@@ -39,6 +40,9 @@ var _ sources.SourceConfig = Config{}
 func init() {
 	if !sources.Register(SourceType, newConfig) {
 		panic(fmt.Sprintf("source type %q already registered", SourceType))
+	}
+	if !sources.Register("dataplex", newConfig) {
+		panic(fmt.Sprintf("source type %q already registered", "dataplex"))
 	}
 }
 
@@ -63,7 +67,12 @@ func (r Config) SourceConfigType() string {
 }
 
 func (r Config) Initialize(ctx context.Context, tracer trace.Tracer) (sources.Source, error) {
+	if r.Project == "" {
+		r.Project = os.Getenv("DATAPLEX_PROJECT")
+	}
+
 	// Initializes a Knowledge Catalog source
+	r.Type = r.SourceConfigType()
 	client, err := initDataplexConnection(ctx, tracer, r.Name, r.Project)
 	if err != nil {
 		return nil, err

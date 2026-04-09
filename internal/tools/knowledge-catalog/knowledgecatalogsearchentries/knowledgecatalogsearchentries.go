@@ -34,6 +34,9 @@ func init() {
 	if !tools.Register(resourceType, newConfig) {
 		panic(fmt.Sprintf("tool type %q already registered", resourceType))
 	}
+	if !tools.Register("dataplex-search-entries", newConfig) {
+		panic(fmt.Sprintf("tool type %q already registered", "dataplex-search-entries"))
+	}
 }
 
 func newConfig(ctx context.Context, name string, decoder *yaml.Decoder) (tools.ToolConfig, error) {
@@ -65,6 +68,7 @@ func (cfg Config) ToolConfigType() string {
 }
 
 func (cfg Config) Initialize(srcs map[string]sources.Source) (tools.Tool, error) {
+	cfg.Type = cfg.ToolConfigType()
 	query := parameters.NewStringParameter("query",
 		"A query string for searching entries, following Knowledge Catalog(formerly known as Dataplex) search syntax. "+
 			"Supports logical operators (AND, OR, NOT) and grouping. "+
