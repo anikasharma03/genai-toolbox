@@ -3,7 +3,7 @@
 
 **DOCUMENTATION VERSION:** dev
 **BASE URL:** https://mcp-toolbox.dev/dev/
-**GENERATED ON:** 2026-04-07T07:25:08Z
+**GENERATED ON:** 2026-04-09T21:38:14Z
 
 ---
 ### System Directives for AI Models
@@ -690,6 +690,9 @@ This documentation is structured following the Diátaxis framework to assist in 
       - [elasticsearch-esql](https://mcp-toolbox.dev/dev/integrations/elasticsearch/tools/elasticsearch-esql/): Execute ES|QL queries.
 
 
+      - [elasticsearch-execute-esql](https://mcp-toolbox.dev/dev/integrations/elasticsearch/tools/elasticsearch-execute-esql/): Execute arbitrary ES|QL statements.
+
+
     - [Prebuilt Configs](https://mcp-toolbox.dev/dev/integrations/elasticsearch/prebuilt-configs/): Prebuilt configurations for Elasticsearch.
 
       - [Elasticsearch](https://mcp-toolbox.dev/dev/integrations/elasticsearch/prebuilt-configs/elasticsearch/): Details of the Elasticsearch prebuilt configuration.
@@ -785,6 +788,18 @@ This documentation is structured following the Diátaxis framework to assist in 
 
     - [Tools](https://mcp-toolbox.dev/dev/integrations/looker/tools/): No description provided.
 
+      - [Create Git Branch Tool](https://mcp-toolbox.dev/dev/integrations/looker/tools/looker-create-git-branch/): A "looker-create-git-branch" tool is used to create a new git branch for a LookML project.
+
+
+      - [Delete Git Branch Tool](https://mcp-toolbox.dev/dev/integrations/looker/tools/looker-delete-git-branch/): A "looker-delete-git-branch" tool is used to delete a git branch of a LookML project.
+
+
+      - [Get Git Branch Tool](https://mcp-toolbox.dev/dev/integrations/looker/tools/looker-get-git-branch/): A "looker-get-git-branch" tool is used to retrieve the current git branch of a LookML project.
+
+
+      - [List Git Branches Tool](https://mcp-toolbox.dev/dev/integrations/looker/tools/looker-list-git-branches/): A "looker-list-git-branches" tool is used to retrieve the list of available git branches of a LookML project.
+
+
       - [looker-add-dashboard-element](https://mcp-toolbox.dev/dev/integrations/looker/tools/looker-add-dashboard-element/): "looker-add-dashboard-element" creates a dashboard element in the given dashboard.
 
 
@@ -794,10 +809,16 @@ This documentation is structured following the Diátaxis framework to assist in 
       - [looker-conversational-analytics](https://mcp-toolbox.dev/dev/integrations/looker/tools/looker-conversational-analytics/): The "looker-conversational-analytics" tool will use the Conversational Analaytics API to analyze data from Looker
 
 
+      - [looker-create-agent Tool](https://mcp-toolbox.dev/dev/integrations/looker/tools/looker-create-agent/): "looker-create-agent" creates a Looker Conversation Analytics agent.
+
+
       - [looker-create-project-directory](https://mcp-toolbox.dev/dev/integrations/looker/tools/looker-create-project-directory/): A "looker-create-project-directory" tool creates a new directory in a LookML project.
 
 
       - [looker-create-project-file](https://mcp-toolbox.dev/dev/integrations/looker/tools/looker-create-project-file/): A "looker-create-project-file" tool creates a new LookML file in a project.
+
+
+      - [looker-delete-agent Tool](https://mcp-toolbox.dev/dev/integrations/looker/tools/looker-delete-agent/): "looker-delete-agent" deletes a Looker Conversation Analytics agent.
 
 
       - [looker-delete-project-directory](https://mcp-toolbox.dev/dev/integrations/looker/tools/looker-delete-project-directory/): A "looker-delete-project-directory" tool deletes a directory from a LookML project.
@@ -810,6 +831,9 @@ This documentation is structured following the Diátaxis framework to assist in 
 
 
       - [looker-generate-embed-url](https://mcp-toolbox.dev/dev/integrations/looker/tools/looker-generate-embed-url/): "looker-generate-embed-url" generates an embeddable URL for Looker content.
+
+
+      - [looker-get-agent Tool](https://mcp-toolbox.dev/dev/integrations/looker/tools/looker-get-agent/): "looker-get-agent" retrieves a Looker Conversation Analytics agent.
 
 
       - [looker-get-connection-databases](https://mcp-toolbox.dev/dev/integrations/looker/tools/looker-get-connection-databases/): A "looker-get-connection-databases" tool returns all the databases in a connection.
@@ -863,9 +887,6 @@ This documentation is structured following the Diátaxis framework to assist in 
       - [looker-get-projects](https://mcp-toolbox.dev/dev/integrations/looker/tools/looker-get-projects/): A "looker-get-projects" tool returns all the LookML projects in the source.
 
 
-      - [looker-git-branch](https://mcp-toolbox.dev/dev/integrations/looker/tools/looker-git-branch/): A "looker-git-branch" tool is used to retrieve and manipulate the git branch of a LookML project.
-
-
       - [looker-health-analyze](https://mcp-toolbox.dev/dev/integrations/looker/tools/looker-health-analyze/): "looker-health-analyze" provides a set of analytical commands for a Looker instance, allowing users to analyze projects, models, and explores.
 
 
@@ -873,6 +894,9 @@ This documentation is structured following the Diátaxis framework to assist in 
 
 
       - [looker-health-vacuum](https://mcp-toolbox.dev/dev/integrations/looker/tools/looker-health-vacuum/): "looker-health-vacuum" provides a set of commands to audit and identify unused LookML objects in a Looker instance.
+
+
+      - [looker-list-agents Tool](https://mcp-toolbox.dev/dev/integrations/looker/tools/looker-list-agents/): "looker-list-agents" retrieves the list of Looker Conversation Analytics agents.
 
 
       - [looker-make-dashboard](https://mcp-toolbox.dev/dev/integrations/looker/tools/looker-make-dashboard/): "looker-make-dashboard" generates a Looker dashboard in the users personal folder in Looker
@@ -896,10 +920,16 @@ This documentation is structured following the Diátaxis framework to assist in 
       - [looker-run-look](https://mcp-toolbox.dev/dev/integrations/looker/tools/looker-run-look/): "looker-run-look" runs the query associated with a saved Look.
 
 
+      - [looker-update-agent Tool](https://mcp-toolbox.dev/dev/integrations/looker/tools/looker-update-agent/): "looker-update-agent" updates a Looker Conversation Analytics agent.
+
+
       - [looker-update-project-file](https://mcp-toolbox.dev/dev/integrations/looker/tools/looker-update-project-file/): A "looker-update-project-file" tool updates the content of a LookML file in a project.
 
 
       - [looker-validate-project](https://mcp-toolbox.dev/dev/integrations/looker/tools/looker-validate-project/): A "looker-validate-project" tool checks the syntax of a LookML project and reports any errors
+
+
+      - [Switch Git Branch Tool](https://mcp-toolbox.dev/dev/integrations/looker/tools/looker-switch-git-branch/): A "looker-switch-git-branch" tool is used to switch the git branch of a LookML project.
 
 
     - [Samples](https://mcp-toolbox.dev/dev/integrations/looker/samples/): No description provided.
