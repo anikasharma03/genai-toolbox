@@ -1,17 +1,16 @@
 ---
-title: "dataplex-lookup-entry"
+title: "lookup-entry"
 type: docs
 weight: 1
 description: >
-  A "dataplex-lookup-entry" tool returns details of a particular entry in Dataplex Catalog.
+  A "lookup-entry" tool returns details of a particular entry in Knowledge Catalog.
 ---
 
 ## About
 
-A `dataplex-lookup-entry` tool returns details of a particular entry in Dataplex
-Catalog.
+A `lookup-entry` tool returns details of a particular entry in Knowledge Catalog.
 
-`dataplex-lookup-entry` takes a required `name` parameter which contains the
+`lookup-entry` takes a required `name` parameter which contains the
 project and location to which the request should be attributed in the following
 form: projects/{project}/locations/{location} and also a required `entry`
 parameter which is the resource name of the entry in the following form:
@@ -37,15 +36,15 @@ It also optionally accepts following parameters:
 
 ### IAM Permissions
 
-Dataplex uses [Identity and Access Management (IAM)][iam-overview] to control
-user and group access to Dataplex resources. Toolbox will use your
+Knowledge Catalog uses [Identity and Access Management (IAM)][iam-overview] to control
+user and group access to Knowledge Catalog resources. Toolbox will use your
 [Application Default Credentials (ADC)][adc] to authorize and authenticate when
-interacting with [Dataplex][dataplex-docs].
+interacting with [Knowledge Catalog][dataplex-docs].
 
 In addition to [setting the ADC for your server][set-adc], you need to ensure
 the IAM identity has been given the correct IAM permissions for the tasks you
-intend to perform. See [Dataplex Universal Catalog IAM permissions][iam-permissions]
-and [Dataplex Universal Catalog IAM roles][iam-roles] for more information on
+intend to perform. See [Knowledge Catalog IAM permissions][iam-permissions]
+and [Knowledge Catalog IAM roles][iam-roles] for more information on
 applying IAM permissions and roles to an identity.
 
 [iam-overview]: https://cloud.google.com/dataplex/docs/iam-and-access-control
@@ -58,10 +57,10 @@ applying IAM permissions and roles to an identity.
 
 ```yaml
 kind: tool
-name: lookup_entry
+name: lookup-entry
 type: dataplex-lookup-entry
 source: my-dataplex-source
-description: Use this tool to retrieve a specific entry in Dataplex Catalog.
+description: Use this tool to retrieve a specific entry in Knowledge Catalog.
 ```
 
 ## Reference

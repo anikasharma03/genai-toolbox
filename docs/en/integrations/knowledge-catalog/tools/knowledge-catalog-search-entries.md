@@ -1,21 +1,24 @@
 ---
-title: "dataplex-search-aspect-types"
+title: "search-entries"
 type: docs
 weight: 1
 description: >
-  A "dataplex-search-aspect-types" tool allows to to find aspect types relevant to the query.
+  A "search-entries" tool allows to search for entries based on the provided query.
 ---
 
 ## About
 
-A `dataplex-search-aspect-types` tool allows to fetch the metadata template of
-aspect types based on search query.
+A `search-entries` tool returns all entries in Knowledge Catalog (formerly known as Dataplex) (e.g.
+tables, views, models) that matches given user query.
 
-`dataplex-search-aspect-types` accepts following parameters optionally:
+`search-entries` takes a required `query` parameter based on which
+entries are filtered and returned to the user. It also optionally accepts
+following parameters:
 
-- `query` - Narrows down the search of aspect types to value of this parameter.
-  If not provided, it fetches all aspect types available to the user.
-- `pageSize` - Number of returned aspect types in the search page. Defaults to `5`.
+- `scope` - A scope limits the search space to a particular project or organization.
+  It must be in the format: organizations/<org_id> or projects/<project_id>
+  or projects/<project_number>.
+- `pageSize` - Number of results in the search page. Defaults to `5`.
 - `orderBy` - Specifies the ordering of results. Supported values are: relevance
   (default), last_modified_timestamp, last_modified_timestamp asc.
 
@@ -28,15 +31,15 @@ aspect types based on search query.
 
 ### IAM Permissions
 
-Dataplex uses [Identity and Access Management (IAM)][iam-overview] to control
-user and group access to Dataplex resources. Toolbox will use your
+Knowledge Catalog uses [Identity and Access Management (IAM)][iam-overview] to control
+user and group access to Knowledge Catalog resources. Toolbox will use your
 [Application Default Credentials (ADC)][adc] to authorize and authenticate when
-interacting with [Dataplex][dataplex-docs].
+interacting with [Knowledge Catalog][dataplex-docs].
 
 In addition to [setting the ADC for your server][set-adc], you need to ensure
 the IAM identity has been given the correct IAM permissions for the tasks you
-intend to perform. See [Dataplex Universal Catalog IAM permissions][iam-permissions]
-and [Dataplex Universal Catalog IAM roles][iam-roles] for more information on
+intend to perform. See [Knowledge Catalog IAM permissions][iam-permissions]
+and [Knowledge Catalog IAM roles][iam-roles] for more information on
 applying IAM permissions and roles to an identity.
 
 [iam-overview]: https://cloud.google.com/dataplex/docs/iam-and-access-control
@@ -50,16 +53,16 @@ applying IAM permissions and roles to an identity.
 
 ```yaml
 kind: tool
-name: dataplex-search-aspect-types
-type: dataplex-search-aspect-types
+name: search-entries
+type: dataplex-search-entries
 source: my-dataplex-source
-description: Use this tool to find aspect types relevant to the query.
+description: Use this tool to get all the entries based on the provided query.
 ```
 
 ## Reference
 
 | **field**   | **type** | **required** | **description**                                    |
 |-------------|:--------:|:------------:|----------------------------------------------------|
-| type        |  string  |     true     | Must be "dataplex-search-aspect-types".            |
+| type        |  string  |     true     | Must be "dataplex-search-entries".                 |
 | source      |  string  |     true     | Name of the source the tool should execute on.     |
 | description |  string  |     true     | Description of the tool that is passed to the LLM. |

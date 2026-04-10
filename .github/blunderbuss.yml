@@ -48,6 +48,10 @@ assign_issues_by:
     to:
     - 'googleapis/toolbox-dataplex-team'
   - labels:
+    - 'product: knowledge-catalog'
+    to:
+    - 'googleapis/toolbox-dataplex-team'
+  - labels:
     - 'product: firestore'
     to:
     - 'googleapis/toolbox-firestore-team'
@@ -89,6 +93,10 @@ assign_prs_by:
     - 'googleapis/toolbox-cloud-sql-postgres-team'
   - labels:
     - 'product: dataplex'
+    to:
+    - 'googleapis/toolbox-dataplex-team'
+  - labels:
+    - 'product: knowledge-catalog'
     to:
     - 'googleapis/toolbox-dataplex-team'
   - labels:
