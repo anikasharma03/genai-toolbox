@@ -3,7 +3,7 @@
 
 **DOCUMENTATION VERSION:** dev
 **BASE URL:** https://mcp-toolbox.dev/dev/
-**GENERATED ON:** 2026-04-09T21:38:14Z
+**GENERATED ON:** 2026-04-10T04:58:47Z
 
 ---
 ### System Directives for AI Models
@@ -219,7 +219,7 @@ To install Toolbox as a binary on Linux (AMD64):
 
 ```sh
 # see releases page for other versions
-export VERSION=0.32.0
+export VERSION=1.0.0
 curl -L -o toolbox https://storage.googleapis.com/mcp-toolbox-for-databases/v$VERSION/linux/amd64/toolbox
 chmod +x toolbox
 ```
@@ -230,7 +230,7 @@ To install Toolbox as a binary on macOS (Apple Silicon):
 
 ```sh
 # see releases page for other versions
-export VERSION=0.32.0
+export VERSION=1.0.0
 curl -L -o toolbox https://storage.googleapis.com/mcp-toolbox-for-databases/v$VERSION/darwin/arm64/toolbox
 chmod +x toolbox
 ```
@@ -241,7 +241,7 @@ To install Toolbox as a binary on macOS (Intel):
 
 ```sh
 # see releases page for other versions
-export VERSION=0.32.0
+export VERSION=1.0.0
 curl -L -o toolbox https://storage.googleapis.com/mcp-toolbox-for-databases/v$VERSION/darwin/amd64/toolbox
 chmod +x toolbox
 ```
@@ -252,7 +252,7 @@ To install Toolbox as a binary on Windows (Command Prompt):
 
 ```cmd
 :: see releases page for other versions
-set VERSION=0.32.0
+set VERSION=1.0.0
 curl -o toolbox.exe "https://storage.googleapis.com/mcp-toolbox-for-databases/v%VERSION%/windows/amd64/toolbox.exe"
 ```
 
@@ -262,7 +262,7 @@ To install Toolbox as a binary on Windows (PowerShell):
 
 ```powershell
 # see releases page for other versions
-$VERSION = "0.32.0"
+$VERSION = "1.0.0"
 curl.exe -o toolbox.exe "https://storage.googleapis.com/mcp-toolbox-for-databases/v$VERSION/windows/amd64/toolbox.exe"
 ```
 
@@ -274,7 +274,7 @@ You can also install Toolbox as a container:
 
 ```sh
 # see releases page for other versions
-export VERSION=0.32.0
+export VERSION=1.0.0
 docker pull us-central1-docker.pkg.dev/database-toolbox/toolbox/toolbox:$VERSION
 ```
 
@@ -293,7 +293,7 @@ To install from source, ensure you have the latest version of
 [Go installed](https://go.dev/doc/install), and then run the following command:
 
 ```sh
-go install github.com/googleapis/mcp-toolbox@v0.32.0
+go install github.com/googleapis/mcp-toolbox@v1.0.0
 ```
 
 {{% /tab %}}
@@ -1043,7 +1043,7 @@ In this section, we will download Toolbox, configure our tools in a
     <!-- {x-release-please-start-version} -->
     ```bash
     export OS="linux/amd64" # one of linux/amd64, darwin/arm64, darwin/amd64, or windows/amd64
-    curl -O https://storage.googleapis.com/mcp-toolbox-for-databases/v0.32.0/$OS/toolbox
+    curl -O https://storage.googleapis.com/mcp-toolbox-for-databases/v1.0.0/$OS/toolbox
     ```
     <!-- {x-release-please-end} -->
 
@@ -9763,19 +9763,19 @@ After you install Looker in the MCP Store, resources and tools from the server a
 
 {{< tabpane persist=header >}}
 {{< tab header="linux/amd64" lang="bash" >}}
-curl -O https://storage.googleapis.com/mcp-toolbox-for-databases/v0.32.0/linux/amd64/toolbox
+curl -O https://storage.googleapis.com/mcp-toolbox-for-databases/v1.0.0/linux/amd64/toolbox
 {{< /tab >}}
 
 {{< tab header="darwin/arm64" lang="bash" >}}
-curl -O https://storage.googleapis.com/mcp-toolbox-for-databases/v0.32.0/darwin/arm64/toolbox
+curl -O https://storage.googleapis.com/mcp-toolbox-for-databases/v1.0.0/darwin/arm64/toolbox
 {{< /tab >}}
 
 {{< tab header="darwin/amd64" lang="bash" >}}
-curl -O https://storage.googleapis.com/mcp-toolbox-for-databases/v0.32.0/darwin/amd64/toolbox
+curl -O https://storage.googleapis.com/mcp-toolbox-for-databases/v1.0.0/darwin/amd64/toolbox
 {{< /tab >}}
 
 {{< tab header="windows/amd64" lang="bash" >}}
-curl -O https://storage.googleapis.com/mcp-toolbox-for-databases/v0.32.0/windows/amd64/toolbox.exe
+curl -O https://storage.googleapis.com/mcp-toolbox-for-databases/v1.0.0/windows/amd64/toolbox.exe
 {{< /tab >}}
 {{< /tabpane >}}
     <!-- {x-release-please-end} -->
@@ -10265,19 +10265,19 @@ expose your developer assistant tools to a MySQL instance:
    <!-- {x-release-please-start-version} -->
    {{< tabpane persist=header >}}
 {{< tab header="linux/amd64" lang="bash" >}}
-curl -O https://storage.googleapis.com/mcp-toolbox-for-databases/v0.32.0/linux/amd64/toolbox
+curl -O https://storage.googleapis.com/mcp-toolbox-for-databases/v1.0.0/linux/amd64/toolbox
 {{< /tab >}}
 
 {{< tab header="darwin/arm64" lang="bash" >}}
-curl -O https://storage.googleapis.com/mcp-toolbox-for-databases/v0.32.0/darwin/arm64/toolbox
+curl -O https://storage.googleapis.com/mcp-toolbox-for-databases/v1.0.0/darwin/arm64/toolbox
 {{< /tab >}}
 
 {{< tab header="darwin/amd64" lang="bash" >}}
-curl -O https://storage.googleapis.com/mcp-toolbox-for-databases/v0.32.0/darwin/amd64/toolbox
+curl -O https://storage.googleapis.com/mcp-toolbox-for-databases/v1.0.0/darwin/amd64/toolbox
 {{< /tab >}}
 
 {{< tab header="windows/amd64" lang="bash" >}}
-curl -O https://storage.googleapis.com/mcp-toolbox-for-databases/v0.32.0/windows/amd64/toolbox.exe
+curl -O https://storage.googleapis.com/mcp-toolbox-for-databases/v1.0.0/windows/amd64/toolbox.exe
 {{< /tab >}}
 {{< /tabpane >}}
     <!-- {x-release-please-end} -->
@@ -10591,19 +10591,19 @@ expose your developer assistant tools to a Neo4j instance:
    <!-- {x-release-please-start-version} -->
    {{< tabpane persist=header >}}
 {{< tab header="linux/amd64" lang="bash" >}}
-curl -O https://storage.googleapis.com/mcp-toolbox-for-databases/v0.32.0/linux/amd64/toolbox
+curl -O https://storage.googleapis.com/mcp-toolbox-for-databases/v1.0.0/linux/amd64/toolbox
 {{< /tab >}}
 
 {{< tab header="darwin/arm64" lang="bash" >}}
-curl -O https://storage.googleapis.com/mcp-toolbox-for-databases/v0.32.0/darwin/arm64/toolbox
+curl -O https://storage.googleapis.com/mcp-toolbox-for-databases/v1.0.0/darwin/arm64/toolbox
 {{< /tab >}}
 
 {{< tab header="darwin/amd64" lang="bash" >}}
-curl -O https://storage.googleapis.com/mcp-toolbox-for-databases/v0.32.0/darwin/amd64/toolbox
+curl -O https://storage.googleapis.com/mcp-toolbox-for-databases/v1.0.0/darwin/amd64/toolbox
 {{< /tab >}}
 
 {{< tab header="windows/amd64" lang="bash" >}}
-curl -O https://storage.googleapis.com/mcp-toolbox-for-databases/v0.32.0/windows/amd64/toolbox.exe
+curl -O https://storage.googleapis.com/mcp-toolbox-for-databases/v1.0.0/windows/amd64/toolbox.exe
 {{< /tab >}}
 {{< /tabpane >}}
     <!-- {x-release-please-end} -->
@@ -10914,19 +10914,19 @@ to expose your developer assistant tools to an Oracle instance:
    <!-- {x-release-please-start-version} -->
    {{< tabpane persist=header >}}
 {{< tab header="linux/amd64" lang="bash" >}}
-curl -O https://storage.googleapis.com/mcp-toolbox-for-databases/v0.32.0/linux/amd64/toolbox
+curl -O https://storage.googleapis.com/mcp-toolbox-for-databases/v1.0.0/linux/amd64/toolbox
 {{< /tab >}}
 
 {{< tab header="darwin/arm64" lang="bash" >}}
-curl -O https://storage.googleapis.com/mcp-toolbox-for-databases/v0.32.0/darwin/arm64/toolbox
+curl -O https://storage.googleapis.com/mcp-toolbox-for-databases/v1.0.0/darwin/arm64/toolbox
 {{< /tab >}}
 
 {{< tab header="darwin/amd64" lang="bash" >}}
-curl -O https://storage.googleapis.com/mcp-toolbox-for-databases/v0.32.0/darwin/amd64/toolbox
+curl -O https://storage.googleapis.com/mcp-toolbox-for-databases/v1.0.0/darwin/amd64/toolbox
 {{< /tab >}}
 
 {{< tab header="windows/amd64" lang="bash" >}}
-curl -O https://storage.googleapis.com/mcp-toolbox-for-databases/v0.32.0/windows/amd64/toolbox.exe
+curl -O https://storage.googleapis.com/mcp-toolbox-for-databases/v1.0.0/windows/amd64/toolbox.exe
 {{< /tab >}}
 {{< /tabpane >}}
     <!-- {x-release-please-end} -->
@@ -11259,19 +11259,19 @@ Omni](https://cloud.google.com/alloydb/omni/docs/overview).
    <!-- {x-release-please-start-version} -->
    {{< tabpane persist=header >}}
 {{< tab header="linux/amd64" lang="bash" >}}
-curl -O https://storage.googleapis.com/mcp-toolbox-for-databases/v0.32.0/linux/amd64/toolbox
+curl -O https://storage.googleapis.com/mcp-toolbox-for-databases/v1.0.0/linux/amd64/toolbox
 {{< /tab >}}
 
 {{< tab header="darwin/arm64" lang="bash" >}}
-curl -O https://storage.googleapis.com/mcp-toolbox-for-databases/v0.32.0/darwin/arm64/toolbox
+curl -O https://storage.googleapis.com/mcp-toolbox-for-databases/v1.0.0/darwin/arm64/toolbox
 {{< /tab >}}
 
 {{< tab header="darwin/amd64" lang="bash" >}}
-curl -O https://storage.googleapis.com/mcp-toolbox-for-databases/v0.32.0/darwin/amd64/toolbox
+curl -O https://storage.googleapis.com/mcp-toolbox-for-databases/v1.0.0/darwin/amd64/toolbox
 {{< /tab >}}
 
 {{< tab header="windows/amd64" lang="bash" >}}
-curl -O https://storage.googleapis.com/mcp-toolbox-for-databases/v0.32.0/windows/amd64/toolbox.exe
+curl -O https://storage.googleapis.com/mcp-toolbox-for-databases/v1.0.0/windows/amd64/toolbox.exe
 {{< /tab >}}
 {{< /tabpane >}}
     <!-- {x-release-please-end} -->
@@ -11612,19 +11612,19 @@ instance:
    <!-- {x-release-please-start-version} -->
    {{< tabpane persist=header >}}
 {{< tab header="linux/amd64" lang="bash" >}}
-curl -O https://storage.googleapis.com/mcp-toolbox-for-databases/v0.32.0/linux/amd64/toolbox
+curl -O https://storage.googleapis.com/mcp-toolbox-for-databases/v1.0.0/linux/amd64/toolbox
 {{< /tab >}}
 
 {{< tab header="darwin/arm64" lang="bash" >}}
-curl -O https://storage.googleapis.com/mcp-toolbox-for-databases/v0.32.0/darwin/arm64/toolbox
+curl -O https://storage.googleapis.com/mcp-toolbox-for-databases/v1.0.0/darwin/arm64/toolbox
 {{< /tab >}}
 
 {{< tab header="darwin/amd64" lang="bash" >}}
-curl -O https://storage.googleapis.com/mcp-toolbox-for-databases/v0.32.0/darwin/amd64/toolbox
+curl -O https://storage.googleapis.com/mcp-toolbox-for-databases/v1.0.0/darwin/amd64/toolbox
 {{< /tab >}}
 
 {{< tab header="windows/amd64" lang="bash" >}}
-curl -O https://storage.googleapis.com/mcp-toolbox-for-databases/v0.32.0/windows/amd64/toolbox.exe
+curl -O https://storage.googleapis.com/mcp-toolbox-for-databases/v1.0.0/windows/amd64/toolbox.exe
 {{< /tab >}}
 {{< /tabpane >}}
     <!-- {x-release-please-end} -->
@@ -11938,19 +11938,19 @@ to expose your developer assistant tools to a SQLite instance:
    <!-- {x-release-please-start-version} -->
    {{< tabpane persist=header >}}
 {{< tab header="linux/amd64" lang="bash" >}}
-curl -O https://storage.googleapis.com/mcp-toolbox-for-databases/v0.32.0/linux/amd64/toolbox
+curl -O https://storage.googleapis.com/mcp-toolbox-for-databases/v1.0.0/linux/amd64/toolbox
 {{< /tab >}}
 
 {{< tab header="darwin/arm64" lang="bash" >}}
-curl -O https://storage.googleapis.com/mcp-toolbox-for-databases/v0.32.0/darwin/arm64/toolbox
+curl -O https://storage.googleapis.com/mcp-toolbox-for-databases/v1.0.0/darwin/arm64/toolbox
 {{< /tab >}}
 
 {{< tab header="darwin/amd64" lang="bash" >}}
-curl -O https://storage.googleapis.com/mcp-toolbox-for-databases/v0.32.0/darwin/amd64/toolbox
+curl -O https://storage.googleapis.com/mcp-toolbox-for-databases/v1.0.0/darwin/amd64/toolbox
 {{< /tab >}}
 
 {{< tab header="windows/amd64" lang="bash" >}}
-curl -O https://storage.googleapis.com/mcp-toolbox-for-databases/v0.32.0/windows/amd64/toolbox.exe
+curl -O https://storage.googleapis.com/mcp-toolbox-for-databases/v1.0.0/windows/amd64/toolbox.exe
 {{< /tab >}}
 {{< /tabpane >}}
     <!-- {x-release-please-end} -->
@@ -21338,6 +21338,7 @@ instead of hardcoding your secrets into the configuration file.
     *   `list_tables_missing_unique_indexes`: Looks for tables that do not have
         primary or unique key contraint.
     *   `list_table_fragmentation`: Displays table fragmentation in MySQL.
+    *   `list_table_stats`: Displays table statistics in MySQL.
 
 
 
@@ -33542,6 +33543,91 @@ The response is a json array with the following fields:
 
 
 ========================================================================
+## mysql-list-table-stats
+========================================================================
+**Hierarchy:** MCP Toolbox for Databases > Integrations > MySQL > Tools > mysql-list-table-stats
+**URL:** https://mcp-toolbox.dev/dev/integrations/mysql/tools/mysql-list-table-stats/
+**Description:** A "mysql-list-table-stats" tool report table statistics including table size, total latency, rows read, rows written, read and write latency for entire instance, a specified database, or a specified table.
+
+
+
+## About
+
+A `mysql-list-table-stats` tool generates table-level performance and resource consumption statistics to facilitate bottleneck identification and workload analysis.
+
+`mysql-list-table-stats` outputs detailed table-level resource consumption including estimated row counts, table size, a complete breakdown of CRUD activity (rows fetched, inserted, updated, and deleted), and IO statistics such as total, read, write and miscellaneous latency. The output is a JSON formatted array of the top 10 MySQL tables ranked by total latency. 
+
+Below are some use cases for `mysql-list-table-stats`
+- **Finding hottest tables**: Identify tables with highest total latency, read or writes based on the `sort_by` column. 
+- **Finding tables with most reads**: Identify tables with highest reads by sorting on `rows_fetched`. 
+- **Monitoring growth**: Track `row_count` and `size_MB` of table over time to estimate growth."
+
+## Compatible Sources
+
+{{< compatible-sources others="integrations/cloud-sql-mysql">}}
+
+## Requirements
+
+- `performance_schema` should be turned ON for this tool to work. 
+
+## Parameters
+
+This tool takes 4 optional input parameters:
+
+- `table_schema` (optional): The database where table stats check is to be
+  executed. Check all tables visible to the current database if not specified.
+- `table_name` (optional): Name of the table to be checked. Check all tables
+  visible to the current user if not specified.
+- `sort_by` (optional): The column to sort by. Valid values are `row_count`, `rows_fetched`, `rows_inserted`, `rows_updated`, `rows_deleted`, `total_latency_secs` (defaults to `total_latency_secs`)
+- `limit` (optional): Max rows to return, default 10.
+
+## Example
+
+```yaml
+kind: tools
+name: list_table_stats
+type: mysql-list-table-stats
+source: my-mysql-instance
+description: Display table statistics including table size, total latency, rows read, rows written, read and write latency for entire instance, a specified database, or a specified table. Specifying a database name or table name filters the output to that specific db or table. Results are limited to 10 by default.
+```
+
+## Output Format
+ 
+The response is a json array with the following fields:
+```json
+[
+  {
+  "table_schema": "The schema/database this table belongs to",
+  "table_name": "Name of this table",
+  "size_MB": "Size of the table data in MB",
+  "row_count": "Number of rows in the table",
+  "total_latency_secs": "total latency in secs",
+  "rows_fetched": "total number of rows fetched",
+  "rows_inserted": "total number of rows inserted",
+  "rows_updated": "total number of rows updated",
+  "rows_deleted": "total number of rows deleted",
+  "io_reads": "total number of io read requests",
+  "io_read_latency": "io read latency in seconds",
+  "io_write_latency": "io write latency in seconds",
+  "io_misc_latency": "io misc latency in seconds",
+  }
+]
+```
+
+## Reference
+
+| **field**   | **type** | **required** | **description**                                    |
+|-------------|:--------:|:------------:|----------------------------------------------------|
+| type        |  string  |     true     | Must be "mysql-list-table-stats".                  |
+| source      |  string  |     true     | Name of the source the SQL should execute on.      |
+| description |  string  |     true     | Description of the tool that is passed to the LLM. |
+
+
+
+
+
+
+========================================================================
 ## mysql-list-tables
 ========================================================================
 **Hierarchy:** MCP Toolbox for Databases > Integrations > MySQL > Tools > mysql-list-tables
@@ -33799,6 +33885,7 @@ templateParameters:
     *   `list_tables_missing_unique_indexes`: Looks for tables that do not have
         primary or unique key contraint.
     *   `list_table_fragmentation`: Displays table fragmentation in MySQL.
+    *   `list_table_stats`: Displays table statistics in MySQL.
 
 
 
@@ -33954,6 +34041,71 @@ parameters:
   - name: year
     type: integer
     description: 4 digit number starting in 1900 up to the current year
+```
+
+### Vector Search
+
+Neo4j supports vector similarity search. When using an `embeddingModel` with a `neo4j-cypher` tool, the tool automatically converts text parameters into the vector format required by Neo4j.
+
+#### Define the Embedding Model
+
+See [EmbeddingModels](../../../documentation/configuration/embedding-models/_index.md) for more information.
+
+kind: embeddingModel
+name: gemini-model
+type: gemini
+model: gemini-embedding-001
+apiKey: ${GOOGLE_API_KEY}
+dimension: 768
+
+#### Vector Ingestion Tool
+
+This tool stores both the raw text and its vector representation. It uses `valueFromParam` to hide the vector conversion logic from the LLM, ensuring the Agent only has to provide the content once.
+```yaml
+kind: tool
+name: insert_doc_neo4j
+type: neo4j-cypher
+source: my-neo4j-source
+statement: |
+  CREATE (n:Document {content: $content, embedding: $text_to_embed})
+  RETURN 1 as result
+description: |
+  Index new documents for semantic search in Neo4j.
+parameters:
+  - name: content
+    type: string
+    description: The text content to store.
+  - name: text_to_embed
+    type: string
+    # Automatically copies 'content' and converts it to a vector array
+    valueFromParam: content
+    embeddedBy: gemini-model
+```
+
+#### Vector Search Tool
+
+This tool allows the Agent to perform a natural language search. The query string provided by the Agent is converted into a vector before the Cypher statement is executed.
+
+```yaml
+kind: tool
+name: search_docs_neo4j
+type: neo4j-cypher
+source: my-neo4j-source
+statement: |
+  MATCH (n:Document)
+  WITH n, vector.similarity.cosine(n.embedding, $query) AS score
+  WHERE score IS NOT NULL
+  ORDER BY score DESC
+  LIMIT 1
+  RETURN n.content as content
+description: |
+  Search for documents in Neo4j using natural language. 
+  Returns the most semantically similar result.
+parameters:
+  - name: query
+    type: string
+    description: The search query to be converted to a vector.
+    embeddedBy: gemini-model
 ```
 
 ## Reference
@@ -38176,6 +38328,75 @@ templateParameters:
     description: Table to select from
 ```
 
+### Example with Vector Search
+
+SingleStore supports vector operations. When using an `embeddingModel` with a `singlestore-sql` tool, the tool automatically converts text parameters into a JSON string array. You can then use SingleStore's `JSON_ARRAY_PACK()` function in your SQL statement to pack this string into a binary vector format (BLOB) for vector storage and similarity search.
+
+#### Define the Embedding Model
+See [EmbeddingModels](../../../documentation/configuration/embedding-models/_index.md) for more information.
+
+```yaml
+kind: embeddingModel
+name: gemini-model
+type: gemini
+model: gemini-embedding-001
+apiKey: ${GOOGLE_API_KEY}
+dimension: 768
+```
+
+#### Vector Ingestion Tool
+This tool stores both the raw text and its vector representation. It uses `valueFromParam` to hide the vector conversion logic from the LLM, ensuring the Agent only has to provide the content once.
+
+```yaml
+kind: tool
+name: insert_doc_singlestore
+type: singlestore-sql
+source: my-s2-source
+statement: |
+  INSERT INTO vector_table (id, content, embedding)
+  VALUES (1, ?, JSON_ARRAY_PACK(?))
+description: |
+  Index new documents for semantic search in SingleStore.
+parameters:
+  - name: content
+    type: string
+    description: The text content to store.
+  - name: text_to_embed
+    type: string
+    # Automatically copies 'content' and converts it to a vector string array
+    valueFromParam: content
+    embeddedBy: gemini-model
+```
+
+#### Vector Search Tool
+This tool allows the Agent to perform a natural language search. The query string provided by the Agent is converted into a vector string array before the SQL is executed.
+
+```yaml
+kind: tool
+name: search_docs_singlestore
+type: singlestore-sql
+source: my-s2-source
+statement: |
+  SELECT 
+    id, 
+    content, 
+    DOT_PRODUCT(embedding, JSON_ARRAY_PACK(?)) AS score 
+  FROM 
+    vector_table 
+  ORDER BY 
+    score DESC
+  LIMIT 1
+description: |
+  Search for documents in SingleStore using natural language. 
+  Returns the most semantically similar result.
+parameters:
+  - name: query
+    type: string
+    description: The search query to be converted to a vector.
+    embeddedBy: gemini-model
+```
+
+
 ## Reference
 
 | **field**          |                   **type**                   | **required** | **description**                                                                                                                        |
@@ -38956,6 +39177,76 @@ parameters:
 
 {{< /tab >}}
 {{< /tabpane >}}
+
+
+### Example with Vector Search
+
+Spanner supports high-performance vector similarity search. When using an `embeddingModel` with a `spanner-sql` tool, the tool automatically converts text parameters into the native ARRAY<FLOAT64> format required by Spanner.
+
+#### Define the Embedding Model
+See [EmbeddingModels](../../../documentation/configuration/embedding-models/_index.md) for more information.
+
+```yaml
+kind: embeddingModel
+name: gemini-model
+type: gemini
+model: gemini-embedding-001
+apiKey: ${GOOGLE_API_KEY}
+dimension: 768
+```
+
+#### Vector Ingestion Tool
+This tool stores both the raw text and its vector representation. It uses `valueFromParam` to hide the vector conversion logic from the LLM, ensuring the Agent only has to provide the content once.
+
+```yaml
+kind: tool
+name: insert_doc_spanner
+type: spanner-sql
+source: my-spanner-source
+statement: |
+  INSERT INTO vector_table (id, content, embedding)
+  VALUES (1, @content, @text_to_embed)
+description: |
+  Index new documents for semantic search in Spanner.
+parameters:
+  - name: content
+    type: string
+    description: The text content to store.
+  - name: text_to_embed
+    type: string
+    # Automatically copies 'content' and converts it to a FLOAT64 array
+    valueFromParam: content
+    embeddedBy: gemini-model
+```
+
+#### Vector Search Tool
+This tool allows the Agent to perform a natural language search. The query string provided by the Agent is converted into a vector before the SQL is executed.
+
+```yaml
+kind: tool
+name: search_docs_spanner
+type: spanner-sql
+source: my-spanner-source
+statement: |
+  SELECT 
+    id, 
+    content, 
+    COSINE_DISTANCE(embedding, @query) AS distance 
+  FROM 
+    vector_table 
+  ORDER BY 
+    distance 
+  LIMIT 1
+description: |
+  Search for documents in Spanner using natural language. 
+  Returns the most semantically similar result.
+parameters:
+  - name: query
+    type: string
+    description: The search query to be converted to a vector.
+    embeddedBy: gemini-model
+```
+
 
 ### Example with Template Parameters
 
