@@ -123,9 +123,6 @@
 - name: 'product: dataplex'
   color: 5065c7
   description: 'Dataplex'
-- name: 'product: knowledge-catalog'
-  color: 5065c7
-  description: 'Knowledge Catalog'
 - name: 'product: dgraph'
   color: 5065c7
   description: 'Dgraph'
