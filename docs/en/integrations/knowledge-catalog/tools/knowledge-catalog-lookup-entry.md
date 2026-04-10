@@ -1,16 +1,16 @@
 ---
-title: "lookup-entry"
+title: "dataplex-lookup-entry"
 type: docs
 weight: 1
 description: >
-  A "lookup-entry" tool returns details of a particular entry in Knowledge Catalog.
+  A "dataplex-lookup-entry" tool returns details of a particular entry in Knowledge Catalog.
 ---
 
 ## About
 
-A `lookup-entry` tool returns details of a particular entry in Knowledge Catalog.
+A `dataplex-lookup-entry` tool returns details of a particular entry in Knowledge Catalog.
 
-`lookup-entry` takes a required `name` parameter which contains the
+`dataplex-lookup-entry` takes a required `name` parameter which contains the
 project and location to which the request should be attributed in the following
 form: projects/{project}/locations/{location} and also a required `entry`
 parameter which is the resource name of the entry in the following form:
@@ -57,7 +57,7 @@ applying IAM permissions and roles to an identity.
 
 ```yaml
 kind: tool
-name: lookup-entry
+name: lookup_entry
 type: dataplex-lookup-entry
 source: my-dataplex-source
 description: Use this tool to retrieve a specific entry in Knowledge Catalog.

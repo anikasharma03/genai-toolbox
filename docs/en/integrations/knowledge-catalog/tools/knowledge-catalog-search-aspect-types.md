@@ -1,17 +1,17 @@
 ---
-title: "search-aspect-types"
+title: "dataplex-search-aspect-types"
 type: docs
 weight: 1
 description: >
-  A "search-aspect-types" tool allows to to find aspect types relevant to the query.
+  A "dataplex-search-aspect-types" tool allows to to find aspect types relevant to the query.
 ---
 
 ## About
 
-A `search-aspect-types` tool allows to fetch the metadata template of
+A `dataplex-search-aspect-types` tool allows to fetch the metadata template of
 aspect types based on search query.
 
-`search-aspect-types` accepts following parameters optionally:
+`dataplex-search-aspect-types` accepts following parameters optionally:
 
 - `query` - Narrows down the search of aspect types to value of this parameter.
   If not provided, it fetches all aspect types available to the user.
@@ -50,7 +50,7 @@ applying IAM permissions and roles to an identity.
 
 ```yaml
 kind: tool
-name: search-aspect-types
+name: search_aspect_types
 type: dataplex-search-aspect-types
 source: my-dataplex-source
 description: Use this tool to find aspect types relevant to the query.

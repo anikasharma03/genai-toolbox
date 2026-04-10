@@ -1,17 +1,17 @@
 ---
-title: "search-entries"
+title: "dataplex-search-entries"
 type: docs
 weight: 1
 description: >
-  A "search-entries" tool allows to search for entries based on the provided query.
+  A "dataplex-search-entries" tool allows to search for entries based on the provided query.
 ---
 
 ## About
 
-A `search-entries` tool returns all entries in Knowledge Catalog (formerly known as Dataplex) (e.g.
+A `dataplex-search-entries` tool returns all entries in Knowledge Catalog (formerly known as Dataplex) (e.g.
 tables, views, models) that matches given user query.
 
-`search-entries` takes a required `query` parameter based on which
+`dataplex-search-entries` takes a required `query` parameter based on which
 entries are filtered and returned to the user. It also optionally accepts
 following parameters:
 
@@ -53,7 +53,7 @@ applying IAM permissions and roles to an identity.
 
 ```yaml
 kind: tool
-name: search-entries
+name: search_entries
 type: dataplex-search-entries
 source: my-dataplex-source
 description: Use this tool to get all the entries based on the provided query.
