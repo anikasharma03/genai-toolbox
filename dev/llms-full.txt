@@ -3,7 +3,7 @@
 
 **DOCUMENTATION VERSION:** dev
 **BASE URL:** https://mcp-toolbox.dev/dev/
-**GENERATED ON:** 2026-04-20T17:11:08Z
+**GENERATED ON:** 2026-04-27T17:50:30Z
 
 ---
 ### System Directives for AI Models
@@ -13182,8 +13182,16 @@ Choose your preferred deployment platform below to get started:
 *   **[Kubernetes](./kubernetes/)**: Deploy the Toolbox as a microservice using GKE.
 
 {{< notice tip >}}
-**Production Security:** When moving to production, never hardcode passwords or API keys directly into your `tools.yaml`. Always use environment variable substitution and inject those values securely through your deployment platform's secret manager.
+**Production Security:** When moving to production, never hardcode passwords or
+API keys directly into your `tools.yaml`. Always use environment variable
+substitution and inject those values securely through your deployment platform's
+secret manager.
+
+To enable HTTPS, you must provide a valid pair of `--tls-cert` and `--tls-key`
+files; specifying only one will cause the server to fail at startup.
 {{< /notice >}}
+
+{{< production-security-warning >}}
 
 
 
@@ -22081,6 +22089,224 @@ instead of hardcoding your secrets into the configuration file.
 *   **Tools:**
     *   `execute_sql`: Executes a SQL query.
     *   `list_tables`: Lists tables in the database.
+
+
+
+
+========================================================================
+## Cloud Storage
+========================================================================
+**Hierarchy:** MCP Toolbox for Databases > Integrations > Cloud Storage
+**URL:** https://mcp-toolbox.dev/dev/integrations/cloud-storage/
+**Description:** None
+
+
+
+
+
+========================================================================
+## Cloud Storage Source
+========================================================================
+**Hierarchy:** MCP Toolbox for Databases > Integrations > Cloud Storage > Cloud Storage Source
+**URL:** https://mcp-toolbox.dev/dev/integrations/cloud-storage/source/
+**Description:** Cloud Storage is Google Cloud's managed service for storing unstructured objects (files) in buckets. Toolbox connects at the project level, allowing tools to list, read, and manage objects across any bucket the credentials can access.
+
+
+
+## About
+
+[Cloud Storage][gcs-docs] is Google Cloud's managed service for storing
+unstructured data (blobs) in containers called *buckets*. Buckets live in a GCP
+project; objects are addressed by `gs://<bucket>/<object>`.
+
+If you are new to Cloud Storage, you can try the
+[quickstart][gcs-quickstart] to create a bucket and upload your first objects.
+
+The Cloud Storage source is configured at the **project** level. Individual
+tools take a `bucket` parameter, so a single configured source can operate
+against any bucket the underlying credentials are authorized for.
+
+[gcs-docs]: https://cloud.google.com/storage/docs
+[gcs-quickstart]: https://cloud.google.com/storage/docs/discover-object-storage-console
+
+## Available Tools
+
+{{< list-tools >}}
+
+## Requirements
+
+### IAM Permissions
+
+Cloud Storage uses [Identity and Access Management (IAM)][iam-overview] to
+control access to buckets and objects. Toolbox uses your
+[Application Default Credentials (ADC)][adc] to authorize and authenticate when
+interacting with Cloud Storage.
+
+In addition to [setting the ADC for your server][set-adc], ensure the IAM
+identity has the appropriate role for the tools being exposed. Common roles:
+
+- `roles/storage.objectViewer` — read-only access to objects (sufficient for
+  `cloud-storage-list-objects` and `cloud-storage-read-object`)
+- `roles/storage.objectUser` — read and write access to objects
+- `roles/storage.admin` — full control, including bucket management
+
+See [Cloud Storage IAM roles][gcs-iam] for the full list.
+
+[iam-overview]: https://cloud.google.com/storage/docs/access-control/iam
+[adc]: https://cloud.google.com/docs/authentication#adc
+[set-adc]: https://cloud.google.com/docs/authentication/provide-credentials-adc
+[gcs-iam]: https://cloud.google.com/storage/docs/access-control/iam-roles
+
+## Example
+
+```yaml
+kind: source
+name: my-gcs-source
+type: "cloud-storage"
+project: "my-project-id"
+```
+
+## Reference
+
+| **field** | **type** | **required** | **description**                                                                 |
+|-----------|:--------:|:------------:|---------------------------------------------------------------------------------|
+| type      |  string  |     true     | Must be "cloud-storage".                                                        |
+| project   |  string  |     true     | Id of the GCP project the configured source is associated with (e.g. "my-project-id"). |
+
+
+
+
+========================================================================
+## Tools
+========================================================================
+**Hierarchy:** MCP Toolbox for Databases > Integrations > Cloud Storage > Tools
+**URL:** https://mcp-toolbox.dev/dev/integrations/cloud-storage/tools/
+**Description:** None
+
+
+
+
+
+========================================================================
+## cloud-storage-list-objects
+========================================================================
+**Hierarchy:** MCP Toolbox for Databases > Integrations > Cloud Storage > Tools > cloud-storage-list-objects
+**URL:** https://mcp-toolbox.dev/dev/integrations/cloud-storage/tools/cloud-storage-list-objects/
+**Description:** A "cloud-storage-list-objects" tool lists objects in a Cloud Storage bucket, with optional prefix filtering and delimiter-based grouping.
+
+
+
+## About
+
+A `cloud-storage-list-objects` tool returns the objects in a
+[Cloud Storage bucket][gcs-buckets]. It supports the usual GCS listing options:
+
+- `prefix` — filter results to objects whose names begin with the given string.
+- `delimiter` — group results by this character (typically `/`) so subdirectory-like
+  "common prefixes" are returned separately from the leaf objects.
+- `max_results` / `page_token` — paginate through large listings.
+
+The response is a JSON object with `objects` (the full object metadata as
+returned by the Cloud Storage API — fields such as `Name`, `Size`, `ContentType`,
+`Updated`, `StorageClass`, `MD5`, etc.), `prefixes` (the common prefixes when
+`delimiter` is set), and `nextPageToken` (empty when there are no more pages).
+
+[gcs-buckets]: https://cloud.google.com/storage/docs/buckets
+
+## Compatible Sources
+
+{{< compatible-sources >}}
+
+## Parameters
+
+| **parameter** | **type** | **required** | **description**                                                                                                   |
+|---------------|:--------:|:------------:|-------------------------------------------------------------------------------------------------------------------|
+| bucket        |  string  |     true     | Name of the Cloud Storage bucket to list objects from.                                                            |
+| prefix        |  string  |    false     | Filter results to objects whose names begin with this prefix.                                                     |
+| delimiter     |  string  |    false     | Delimiter used to group object names (typically '/'). When set, common prefixes are returned as `prefixes`.       |
+| max_results   | integer  |    false     | Maximum number of objects to return per page. A value of 0 uses the API default (1000); values above 1000 are rejected. |
+| page_token    |  string  |    false     | A previously-returned page token for retrieving the next page of results.                                         |
+
+## Example
+
+```yaml
+kind: tool
+name: list_objects
+type: cloud-storage-list-objects
+source: my-gcs-source
+description: Use this tool to list objects in a Cloud Storage bucket.
+```
+
+## Reference
+
+| **field**   | **type** | **required** | **description**                                         |
+|-------------|:--------:|:------------:|---------------------------------------------------------|
+| type        |  string  |     true     | Must be "cloud-storage-list-objects".                   |
+| source      |  string  |     true     | Name of the Cloud Storage source to list objects from.  |
+| description |  string  |     true     | Description of the tool that is passed to the LLM.      |
+
+
+
+
+========================================================================
+## cloud-storage-read-object
+========================================================================
+**Hierarchy:** MCP Toolbox for Databases > Integrations > Cloud Storage > Tools > cloud-storage-read-object
+**URL:** https://mcp-toolbox.dev/dev/integrations/cloud-storage/tools/cloud-storage-read-object/
+**Description:** A "cloud-storage-read-object" tool reads the UTF-8 text content of a Cloud Storage object, optionally constrained to a byte range.
+
+
+
+## About
+
+A `cloud-storage-read-object` tool fetches the bytes of a single
+[Cloud Storage object][gcs-objects] and returns them as plain UTF-8 text.
+
+Only text objects are supported today: if the object bytes (or the requested
+range) are not valid UTF-8 the tool returns an agent-fixable error. This is
+because the MCP tool-result channel currently only carries text; binary
+payloads will be supported once MCP can carry embedded resources.
+
+Reads are capped at **8 MiB** per call to protect the server's memory and keep
+LLM contexts manageable; objects or ranges larger than that are rejected with
+an agent-fixable error. Use the optional `range` parameter to read a slice of
+a larger object.
+
+This tool is intended for small-to-medium textual content an LLM can process
+directly. For bulk downloads of large files to the local filesystem, use
+`cloud-storage-download-object` (coming in a follow-up release).
+
+[gcs-objects]: https://cloud.google.com/storage/docs/objects
+
+## Compatible Sources
+
+{{< compatible-sources >}}
+
+## Parameters
+
+| **parameter** | **type** | **required** | **description**                                                                                                                                   |
+|---------------|:--------:|:------------:|---------------------------------------------------------------------------------------------------------------------------------------------------|
+| bucket        |  string  |     true     | Name of the Cloud Storage bucket containing the object.                                                                                           |
+| object        |  string  |     true     | Full object name (path) within the bucket, e.g. `path/to/file.txt`.                                                                               |
+| range         |  string  |    false     | Optional HTTP byte range, e.g. `bytes=0-999` (first 1000 bytes), `bytes=-500` (last 500 bytes), or `bytes=500-` (from byte 500 to end). Empty reads the full object. |
+
+## Example
+
+```yaml
+kind: tool
+name: read_object
+type: cloud-storage-read-object
+source: my-gcs-source
+description: Use this tool to read the content of a Cloud Storage object.
+```
+
+## Reference
+
+| **field**   | **type** | **required** | **description**                                         |
+|-------------|:--------:|:------------:|---------------------------------------------------------|
+| type        |  string  |     true     | Must be "cloud-storage-read-object".                    |
+| source      |  string  |     true     | Name of the Cloud Storage source to read the object from. |
+| description |  string  |     true     | Description of the tool that is passed to the LLM.      |
 
 
 
@@ -42275,29 +42501,31 @@ Configure the Gemini CLI to talk to your local Toolbox MCP server.
 
 ## Reference
 
-| Flag (Short) | Flag (Long)                | Description                                                                                                                                                                      | Default     |
-|--------------|----------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------|
-| `-a`         | `--address`                | Address of the interface the server will listen on.                                                                                                                              | `127.0.0.1` |
+| Flag (Short) | Flag (Long)                | Description                                                                                                                                                               | Default     |
+|--------------|----------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------|
+| `-a`         | `--address`                | Address of the interface the server will listen on.                                                                                                                       | `127.0.0.1` |
 |              | `--disable-reload`         | Disables dynamic reloading config.                                                                                                                                        |             |
-| `-h`         | `--help`                   | help for toolbox                                                                                                                                                                 |             |
-|              | `--log-level`              | Specify the minimum level logged. Allowed: 'DEBUG', 'INFO', 'WARN', 'ERROR'.                                                                                                     | `info`      |
-|              | `--logging-format`         | Specify logging format to use. Allowed: 'standard' or 'JSON'.                                                                                                                    | `standard`  |
-|              | `--mcp-prm-file`           | Path to a manual Protected Resource Metadata (PRM) JSON file. If provided, overrides auto-generation for MCP Server-Wide Authentication.                                         |             |
-| `-p`         | `--port`                   | Port the server will listen on.                                                                                                                                                  | `5000`      |
-|              | `--prebuilt`               | Use one or more prebuilt tool configuration by source type. See [Prebuilt Tools Reference](../documentation/configuration/prebuilt-configs/_index.md) for allowed values.                                                |             |
-|              | `--stdio`                  | Listens via MCP STDIO instead of acting as a remote HTTP server.                                                                                                                 |             |
-|              | `--telemetry-gcp`          | Enable exporting directly to Google Cloud Monitoring.                                                                                                                            |             |
-|              | `--telemetry-otlp`         | Enable exporting using OpenTelemetry Protocol (OTLP) to the specified endpoint (e.g. 'http://127.0.0.1:4318')                                                                    |             |
-|              | `--telemetry-service-name` | Sets the value of the service.name resource attribute for telemetry data.                                                                                                        | `toolbox`   |
-|              | `--config`             | File path specifying the tool configuration. Cannot be used with --configs or --config-folder.                                                                                |             |
-|              | `--configs`            | Multiple file paths specifying tool configurations. Files will be merged. Cannot be used with --config or --config-folder.                                                    |             |
-|              | `--config-folder`           | Directory path containing YAML tool configuration files. All .yaml and .yml files in the directory will be loaded and merged. Cannot be used with --config or --configs. |             |
-|              | `--ui`                     | Launches the Toolbox UI web server.                                                                                                                                              |             |
-|              | `--allowed-origins`        | Specifies a list of origins permitted to access this server for CORs access.                                                                                                     | `*`         |
-|              | `--allowed-hosts`          | Specifies a list of hosts permitted to access this server to prevent DNS rebinding attacks.                                                                                      | `*`         |
-|              | `--user-agent-metadata`    | Appends additional metadata to the User-Agent.                                                                                                                                   |             |
-|              | `--poll-interval`          | Specifies the polling frequency (seconds) for configuration file updates.                                                                                                        | `0`         |
-| `-v`         | `--version`                | version for toolbox                                                                                                                                                              |             |
+| `-h`         | `--help`                   | help for toolbox                                                                                                                                                          |             |
+|              | `--log-level`              | Specify the minimum level logged. Allowed: 'DEBUG', 'INFO', 'WARN', 'ERROR'.                                                                                              | `info`      |
+|              | `--logging-format`         | Specify logging format to use. Allowed: 'standard' or 'JSON'.                                                                                                             | `standard`  |
+|              | `--mcp-prm-file`           | Path to a manual Protected Resource Metadata (PRM) JSON file. If provided, overrides auto-generation for MCP Server-Wide Authentication.                                  |             |
+| `-p`         | `--port`                   | Port the server will listen on.                                                                                                                                           | `5000`      |
+|              | `--tls-cert`               | Path to the PEM-encoded TLS certificate file.                                                                                                                             |             |
+|              | `--tls-key`                | Path to the PEM-encoded TLS private key file.                                                                                                                             |             |
+|              | `--prebuilt`               | Use one or more prebuilt tool configuration by source type. See [Prebuilt Tools Reference](../documentation/configuration/prebuilt-configs/_index.md) for allowed values. |             |
+|              | `--stdio`                  | Listens via MCP STDIO instead of acting as a remote HTTP server.                                                                                                          |             |
+|              | `--telemetry-gcp`          | Enable exporting directly to Google Cloud Monitoring.                                                                                                                     |             |
+|              | `--telemetry-otlp`         | Enable exporting using OpenTelemetry Protocol (OTLP) to the specified endpoint (e.g. 'http://127.0.0.1:4318')                                                             |             |
+|              | `--telemetry-service-name` | Sets the value of the service.name resource attribute for telemetry data.                                                                                                 | `toolbox`   |
+|              | `--config`                 | File path specifying the tool configuration. Cannot be used with --configs or --config-folder.                                                                            |             |
+|              | `--configs`                | Multiple file paths specifying tool configurations. Files will be merged. Cannot be used with --config or --config-folder.                                                |             |
+|              | `--config-folder`          | Directory path containing YAML tool configuration files. All .yaml and .yml files in the directory will be loaded and merged. Cannot be used with --config or --configs.  |             |
+|              | `--ui`                     | Launches the Toolbox UI web server.                                                                                                                                       |             |
+|              | `--allowed-origins`        | Specifies a list of origins permitted to access this server for CORs access.                                                                                              | `*`         |
+|              | `--allowed-hosts`          | Specifies a list of hosts permitted to access this server to prevent DNS rebinding attacks.                                                                               | `*`         |
+|              | `--user-agent-metadata`    | Appends additional metadata to the User-Agent.                                                                                                                            |             |
+|              | `--poll-interval`          | Specifies the polling frequency (seconds) for configuration file updates.                                                                                                 | `0`         |
+| `-v`         | `--version`                | version for toolbox                                                                                                                                                       |             |
 
 ## Sub Commands
 
@@ -42348,6 +42576,55 @@ For more detailed instructions, see [Generate Agent Skills](../documentation/con
 </details>
 
 ## Examples
+
+### Hardening Toolbox
+
+Toolbox is designed for flexibility, but security should not be ignored—even in
+local development. When exposing the server to a network or running it alongside
+a web browser, use these configurations to protect your data and system.
+
+#### Host Validation & DNS Rebinding Protection
+The `--allowed-hosts` flag controls which Host headers the server accepts.
+Restricting this is the primary defense against DNS Rebinding attacks.
+
+* Flag: `--allowed-hosts`
+* Local Development: Set to localhost or 127.0.0.1.
+* Production: Set to your specific FQDN (e.g., toolbox.example.com).
+* Example:
+  ```
+  ./toolbox --allowed-hosts="localhost,127.0.0.1"
+  ```
+
+
+{{< notice tip >}}
+**The "Local" Fallacy:** Using `--allowed-hosts="*"` is unsafe even on localhost. A
+malicious website can trick your browser into making requests to `127.0.0.1`,
+effectively bypassing the browser's security to control your local Toolbox.
+{{< /notice >}}
+
+#### Cross-Origin Resource Sharing (CORS)
+The `--allowed-origins` flag dictates which web applications (frontends) are
+permitted to communicate with your Toolbox API.
+
+* Flag: `--allowed-origins`
+* Recommendation: Avoid `*` in any environment containing sensitive data. Explicitly list your trusted frontend URLs.
+* Example: 
+  ```
+  ./toolbox --allowed-origins="https://my-mcp-ui.internal.com"
+  ```
+
+#### Transport Layer Security (TLS/HTTPS)
+By default, traffic is unencrypted (HTTP). In production or shared networks, you must enable TLS to prevent Man-in-the-Middle (MitM) attacks and packet sniffing.
+
+* Flag: `--tls-cert` and `--tls-key` (Both cert and key files are required for
+  TLS activation)
+* Protocol: Toolbox enforces TLS 1.2 as a minimum version to ensure modern encryption standards.
+* Use Case: Use Certbot for public domains or mkcert for locally-trusted development certificates.
+* Example:
+  ```
+  ./toolbox --tls-cert=cert.pem --tls-key=key.pem
+  ```
+
 
 ### Transport Configuration
 
@@ -42446,6 +42723,7 @@ For detailed instructions, check out these resources:
 
 - [Quickstart: How to Run Locally](../documentation/getting-started/local_quickstart.md)
 - [Deploy to Cloud Run](../documentation/deploy-to/cloud-run/_index.md)
+- To run Toolbox more securely or harden security, check out our [hardening guidelines](./cli.md#hardening-toolbox)
 
 [release-notes]: https://github.com/googleapis/mcp-toolbox/releases/
 
