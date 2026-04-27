@@ -1700,7 +1700,7 @@ func TestPrebuiltTools(t *testing.T) {
 				},
 				"data": tools.ToolsetConfig{
 					Name:      "data",
-					ToolNames: []string{"execute_sql", "list_tables", "list_views", "list_schemas", "list_triggers", "list_indexes", "list_sequences", "list_stored_procedure"},
+					ToolNames: []string{"execute_sql", "list_tables", "list_views", "list_schemas", "list_triggers", "list_indexes", "list_sequences", "list_stored_procedure", "search_catalog"},
 				},
 				"monitor": tools.ToolsetConfig{
 					Name:      "monitor",

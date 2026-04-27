@@ -38,6 +38,7 @@ import (
 	"time"
 
 	"github.com/google/go-cmp/cmp"
+	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/googleapis/mcp-toolbox/internal/auth"
 	"github.com/googleapis/mcp-toolbox/internal/auth/generic"
 	"github.com/googleapis/mcp-toolbox/internal/embeddingmodels"
@@ -273,7 +274,7 @@ func TestUpdateServer(t *testing.T) {
 	}
 
 	gotSource, _ := s.ResourceMgr.GetSource("example-source")
-	if diff := cmp.Diff(gotSource, newSources["example-source"]); diff != "" {
+	if diff := cmp.Diff(gotSource, newSources["example-source"], cmpopts.IgnoreUnexported(alloydbpg.Source{})); diff != "" {
 		t.Errorf("error updating server, sources (-want +got):\n%s", diff)
 	}
 

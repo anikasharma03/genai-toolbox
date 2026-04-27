@@ -16,11 +16,14 @@ package alloydbpg
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net"
 	"strings"
+	"sync"
 
 	"cloud.google.com/go/alloydbconn"
+	dataplexapi "cloud.google.com/go/dataplex/apiv1"
 	"github.com/goccy/go-yaml"
 	"github.com/googleapis/mcp-toolbox/internal/sources"
 	"github.com/googleapis/mcp-toolbox/internal/sources/sqlcommenter"
@@ -28,6 +31,8 @@ import (
 	"github.com/googleapis/mcp-toolbox/internal/util/orderedmap"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"go.opentelemetry.io/otel/trace"
+	"golang.org/x/oauth2"
+	"google.golang.org/api/option"
 )
 
 const SourceType string = "alloydb-postgres"
@@ -50,16 +55,17 @@ func newConfig(ctx context.Context, name string, decoder *yaml.Decoder) (sources
 }
 
 type Config struct {
-	Name     string         `yaml:"name" validate:"required"`
-	Type     string         `yaml:"type" validate:"required"`
-	Project  string         `yaml:"project" validate:"required"`
-	Region   string         `yaml:"region" validate:"required"`
-	Cluster  string         `yaml:"cluster" validate:"required"`
-	Instance string         `yaml:"instance" validate:"required"`
-	IPType   sources.IPType `yaml:"ipType" validate:"required"`
-	User     string         `yaml:"user"`
-	Password string         `yaml:"password"`
-	Database string         `yaml:"database" validate:"required"`
+	Name           string         `yaml:"name" validate:"required"`
+	Type           string         `yaml:"type" validate:"required"`
+	Project        string         `yaml:"project" validate:"required"`
+	Region         string         `yaml:"region" validate:"required"`
+	Cluster        string         `yaml:"cluster" validate:"required"`
+	Instance       string         `yaml:"instance" validate:"required"`
+	IPType         sources.IPType `yaml:"ipType" validate:"required"`
+	User           string         `yaml:"user"`
+	Password       string         `yaml:"password"`
+	Database       string         `yaml:"database" validate:"required"`
+	UseClientOAuth bool           `yaml:"useClientOAuth"`
 }
 
 func (r Config) SourceConfigType() string {
@@ -77,9 +83,16 @@ func (r Config) Initialize(ctx context.Context, tracer trace.Tracer) (sources.So
 		return nil, fmt.Errorf("unable to connect successfully: %w", err)
 	}
 
+	onDataplexEvict := func(key string, value interface{}) {
+		if client, ok := value.(*dataplexapi.CatalogClient); ok && client != nil {
+			client.Close()
+		}
+	}
+
 	s := &Source{
-		Config: r,
-		Pool:   pool,
+		Config:        r,
+		Pool:          pool,
+		dataplexCache: sources.NewCache(onDataplexEvict),
 	}
 	return s, nil
 }
@@ -88,7 +101,11 @@ var _ sources.Source = &Source{}
 
 type Source struct {
 	Config
-	Pool *pgxpool.Pool
+	Pool          *pgxpool.Pool
+	catalogClient *dataplexapi.CatalogClient
+	catalogClientErr error
+	dataplexOnce  sync.Once
+	dataplexCache *sources.Cache
 }
 
 func (s *Source) SourceType() string {
@@ -101,6 +118,70 @@ func (s *Source) ToConfig() sources.SourceConfig {
 
 func (s *Source) PostgresPool() *pgxpool.Pool {
 	return s.Pool
+}
+
+func (s *Source) AlloyDBProject() string {
+	return s.Config.Project
+}
+
+func (s *Source) ProjectID() string {
+	return s.Config.Project
+}
+
+func (s *Source) UseClientAuthorization() bool {
+	return s.UseClientOAuth
+}
+
+func (s *Source) GetCatalogClient(ctx context.Context, tokenString string) (*dataplexapi.CatalogClient, error) {
+	if s.UseClientOAuth && tokenString != "" {
+		// Check cache
+		if val, found := s.dataplexCache.Get(tokenString); found {
+			return val.(*dataplexapi.CatalogClient), nil
+		}
+
+		// Cache miss - create new client
+		userAgent, err := util.UserAgentFromContext(ctx)
+		if err != nil {
+			userAgent = "genai-toolbox"
+		}
+		token := &oauth2.Token{AccessToken: tokenString}
+		ts := oauth2.StaticTokenSource(token)
+		client, err := dataplexapi.NewCatalogClient(ctx, option.WithUserAgent(userAgent), option.WithTokenSource(ts))
+		if err != nil {
+			return nil, fmt.Errorf("failed to create Dataplex client with OAuth token: %w", err)
+		}
+
+		// Set in cache
+		s.dataplexCache.Set(tokenString, client)
+		return client, nil
+	}
+
+	// Fallback to default client (lazy initialized)
+	s.dataplexOnce.Do(func() {
+		userAgent, err2 := util.UserAgentFromContext(ctx)
+		if err2 != nil {
+			userAgent = "genai-toolbox"
+		}
+		s.catalogClient, s.catalogClientErr = dataplexapi.NewCatalogClient(ctx, option.WithUserAgent(userAgent))
+	})
+	if s.catalogClientErr != nil {
+		return nil, fmt.Errorf("failed to initialize default Dataplex client: %w", s.catalogClientErr)
+	}
+	return s.catalogClient, nil
+}
+
+// Close closes the default catalog client.
+func (s *Source) Close() error {
+	var errs []error
+	if s.catalogClient != nil {
+		if err := s.catalogClient.Close(); err != nil {
+			errs = append(errs, fmt.Errorf("failed to close default catalog client: %w", err))
+		}
+	}
+	if len(errs) > 0 {
+		return errors.Join(errs...)
+	}
+	return nil
 }
 
 func (s *Source) RunSQL(ctx context.Context, statement string, params []any) (any, error) {

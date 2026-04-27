@@ -73,6 +73,10 @@ func getAlloyDBToolsConfig() map[string]any {
 			"alloydb-admin-source": map[string]any{
 				"type": "alloydb-admin",
 			},
+			"alloydb-oauth-source": map[string]any{
+				"type":           "alloydb-admin",
+				"useClientOAuth": true,
+			},
 		},
 		"tools": map[string]any{
 			// Tool for RunAlloyDBToolGetTest
@@ -92,6 +96,25 @@ func getAlloyDBToolsConfig() map[string]any {
 				"type":        "alloydb-list-clusters",
 				"source":      "alloydb-admin-source",
 				"description": "Tool that will fail",
+			},
+			// Tool for search catalog test
+			"my-search-catalog-tool": map[string]any{
+				"type":        "alloydb-search-catalog",
+				"source":      "alloydb-admin-source",
+				"description": "Searches for data assets in catalog",
+			},
+			"my-auth-search-catalog-tool": map[string]any{
+				"type":        "alloydb-search-catalog",
+				"source":      "alloydb-admin-source",
+				"description": "Searches for data assets in catalog",
+				"authRequired": []string{
+					"my-google-auth",
+				},
+			},
+			"my-client-auth-search-catalog-tool": map[string]any{
+				"type":        "alloydb-search-catalog",
+				"source":      "alloydb-oauth-source",
+				"description": "Searches for data assets in catalog",
 			},
 			// AlloyDB specific tools
 			"alloydb-list-clusters": map[string]any{
