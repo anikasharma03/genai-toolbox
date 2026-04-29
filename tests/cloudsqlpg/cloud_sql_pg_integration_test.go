@@ -15,9 +15,13 @@
 package cloudsqlpg
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
+	"io"
 	"net"
+	"net/http"
 	"os"
 	"regexp"
 	"strings"
@@ -152,6 +156,17 @@ func TestCloudSQLPgSimpleToolEndpoints(t *testing.T) {
 	toolsFile = tests.AddSemanticSearchConfig(t, toolsFile, CloudSQLPostgresToolType, insertStmt, searchStmt)
 
 	toolsFile = tests.AddPostgresPrebuiltConfig(t, toolsFile)
+	// Add search catalog tool config
+	tools, ok := toolsFile["tools"].(map[string]any)
+	if !ok {
+		t.Fatalf("unable to get tools from config")
+	}
+	tools["my-search-catalog-tool"] = map[string]any{
+		"type":        "postgres-search-catalog",
+		"source":      "my-instance",
+		"description": "Tool to search the Cloud SQL catalog",
+	}
+	toolsFile["tools"] = tools
 	cmd, cleanup, err := tests.StartCmd(ctx, toolsFile, args...)
 	if err != nil {
 		t.Fatalf("command initialization returned an error: %s", err)
@@ -200,6 +215,35 @@ func TestCloudSQLPgSimpleToolEndpoints(t *testing.T) {
 	tests.RunPostgresListRolesTest(t, ctx, pool)
 	tests.RunPostgresListStoredProcedureTest(t, ctx, pool)
 	tests.RunSemanticSearchToolInvokeTest(t, "[]", "", "The quick brown fox")
+	
+	t.Run("invoke my-search-catalog-tool", func(t *testing.T) {
+		api := "http://127.0.0.1:5000/api/tool/my-search-catalog-tool/invoke"
+		body := fmt.Sprintf(`{"prompt":"%s", "types":["TABLE"], "databaseIds":["%s"]}`, tableNameParam, CloudSQLPostgresDatabase)
+		req, err := http.NewRequest(http.MethodPost, api, bytes.NewBuffer([]byte(body)))
+		if err != nil {
+			t.Fatalf("unable to create request: %s", err)
+		}
+		req.Header.Add("Content-type", "application/json")
+		resp, err := http.DefaultClient.Do(req)
+		if err != nil {
+			t.Fatalf("unable to send request: %s", err)
+		}
+		defer resp.Body.Close()
+
+		if resp.StatusCode != http.StatusOK {
+			bodyBytes, _ := io.ReadAll(resp.Body)
+			t.Fatalf("response status code is not 200, got %d: %s", resp.StatusCode, string(bodyBytes))
+		}
+
+		var result map[string]interface{}
+		if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+			t.Fatalf("error parsing response body: %s", err)
+		}
+		_, ok := result["result"].(string)
+		if !ok {
+			t.Fatalf("expected 'result' field to be a string, got %T", result["result"])
+		}
+	})
 }
 
 // Test connection with different IP type

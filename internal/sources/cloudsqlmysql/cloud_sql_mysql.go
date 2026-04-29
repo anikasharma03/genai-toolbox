@@ -22,6 +22,7 @@ import (
 	"slices"
 
 	"cloud.google.com/go/cloudsqlconn/mysql/mysql"
+	dataplexapi "cloud.google.com/go/dataplex/apiv1"
 	"github.com/goccy/go-yaml"
 	"github.com/googleapis/mcp-toolbox/internal/sources"
 	"github.com/googleapis/mcp-toolbox/internal/sources/sqlcommenter"
@@ -29,6 +30,9 @@ import (
 	"github.com/googleapis/mcp-toolbox/internal/util"
 	"github.com/googleapis/mcp-toolbox/internal/util/orderedmap"
 	"go.opentelemetry.io/otel/trace"
+	"golang.org/x/oauth2"
+	"google.golang.org/api/option"
+	"sync"
 )
 
 const SourceType string = "cloud-sql-mysql"
@@ -51,15 +55,16 @@ func newConfig(ctx context.Context, name string, decoder *yaml.Decoder) (sources
 }
 
 type Config struct {
-	Name     string         `yaml:"name" validate:"required"`
-	Type     string         `yaml:"type" validate:"required"`
-	Project  string         `yaml:"project" validate:"required"`
-	Region   string         `yaml:"region" validate:"required"`
-	Instance string         `yaml:"instance" validate:"required"`
-	IPType   sources.IPType `yaml:"ipType"`
-	User     string         `yaml:"user"`
-	Password string         `yaml:"password"`
-	Database string         `yaml:"database"`
+	Name           string         `yaml:"name" validate:"required"`
+	Type           string         `yaml:"type" validate:"required"`
+	Project        string         `yaml:"project" validate:"required"`
+	Region         string         `yaml:"region" validate:"required"`
+	Instance       string         `yaml:"instance" validate:"required"`
+	IPType         sources.IPType `yaml:"ipType"`
+	User           string         `yaml:"user"`
+	Password       string         `yaml:"password"`
+	Database       string         `yaml:"database"`
+	UseClientOAuth bool           `yaml:"useClientOAuth"`
 }
 
 func (r Config) SourceConfigType() string {
@@ -77,9 +82,16 @@ func (r Config) Initialize(ctx context.Context, tracer trace.Tracer) (sources.So
 		return nil, fmt.Errorf("unable to connect successfully: %w", err)
 	}
 
+	onDataplexEvict := func(key string, value interface{}) {
+		if client, ok := value.(*dataplexapi.CatalogClient); ok && client != nil {
+			client.Close()
+		}
+	}
+
 	s := &Source{
-		Config: r,
-		Pool:   pool,
+		Config:        r,
+		Pool:          pool,
+		dataplexCache: sources.NewCache(onDataplexEvict),
 	}
 	return s, nil
 }
@@ -88,7 +100,11 @@ var _ sources.Source = &Source{}
 
 type Source struct {
 	Config
-	Pool *sql.DB
+	Pool          *sql.DB
+	catalogClient *dataplexapi.CatalogClient
+	catalogClientErr error
+	dataplexOnce  sync.Once
+	dataplexCache *sources.Cache
 }
 
 func (s *Source) SourceType() string {
@@ -252,3 +268,60 @@ func initCloudSQLMySQLConnectionPool(ctx context.Context, tracer trace.Tracer, n
 	}
 	return db, nil
 }
+
+func (s *Source) ProjectID() string {
+	return s.Config.Project
+}
+
+func (s *Source) UseClientAuthorization() bool {
+	return s.Config.UseClientOAuth
+}
+
+func (s *Source) GetCatalogClient(ctx context.Context, tokenString string) (*dataplexapi.CatalogClient, error) {
+	if s.UseClientOAuth && tokenString != "" {
+		if val, found := s.dataplexCache.Get(tokenString); found {
+			return val.(*dataplexapi.CatalogClient), nil
+		}
+
+		userAgent, err := util.UserAgentFromContext(ctx)
+		if err != nil {
+			userAgent = "genai-toolbox"
+		}
+		token := &oauth2.Token{AccessToken: tokenString}
+		ts := oauth2.StaticTokenSource(token)
+		client, err := dataplexapi.NewCatalogClient(ctx, option.WithUserAgent(userAgent), option.WithTokenSource(ts))
+		if err != nil {
+			return nil, fmt.Errorf("failed to create Dataplex client with OAuth token: %w", err)
+		}
+
+		s.dataplexCache.Set(tokenString, client)
+		return client, nil
+	}
+
+	s.dataplexOnce.Do(func() {
+		userAgent, err2 := util.UserAgentFromContext(ctx)
+		if err2 != nil {
+			userAgent = "genai-toolbox"
+		}
+		s.catalogClient, s.catalogClientErr = dataplexapi.NewCatalogClient(ctx, option.WithUserAgent(userAgent))
+	})
+	if s.catalogClientErr != nil {
+		return nil, fmt.Errorf("failed to initialize default Dataplex client: %w", s.catalogClientErr)
+	}
+	return s.catalogClient, nil
+}
+
+// Close closes the default catalog client.
+func (s *Source) Close() error {
+	var errs []error
+	if s.catalogClient != nil {
+		if err := s.catalogClient.Close(); err != nil {
+			errs = append(errs, fmt.Errorf("failed to close default catalog client: %w", err))
+		}
+	}
+	if len(errs) > 0 {
+		return errors.Join(errs...)
+	}
+	return nil
+}
+

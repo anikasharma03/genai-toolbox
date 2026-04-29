@@ -437,6 +437,12 @@ name: generate_query
 type: vector-assist-generate-query
 source: cloudsql-pg-source
 ---
+kind: tool
+name: search_catalog
+type: postgres-search-catalog
+source: cloudsql-pg-source
+description: Searches for data assets (eg. Postgres tables, views, or databases) in catalog based on the provided search query
+---
 kind: toolset
 name: admin
 tools:
@@ -471,6 +477,7 @@ tools:
 - list_indexes
 - list_sequences
 - list_stored_procedure
+- search_catalog
 ---
 kind: toolset
 name: monitor

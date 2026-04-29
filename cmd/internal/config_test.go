@@ -1758,7 +1758,7 @@ func TestPrebuiltTools(t *testing.T) {
 				},
 				"data": tools.ToolsetConfig{
 					Name:      "data",
-					ToolNames: []string{"execute_sql", "list_tables", "list_views", "list_schemas", "list_triggers", "list_indexes", "list_sequences", "list_stored_procedure"},
+					ToolNames: []string{"execute_sql", "list_tables", "list_views", "list_schemas", "list_triggers", "list_indexes", "list_sequences", "list_stored_procedure", "search_catalog"},
 				},
 				"monitor": tools.ToolsetConfig{
 					Name:      "monitor",
@@ -1792,7 +1792,7 @@ func TestPrebuiltTools(t *testing.T) {
 				},
 				"data": tools.ToolsetConfig{
 					Name:      "data",
-					ToolNames: []string{"execute_sql", "list_tables", "get_query_plan", "list_active_queries"},
+					ToolNames: []string{"execute_sql", "list_tables", "get_query_plan", "list_active_queries", "search_catalog"},
 				},
 				"monitor": tools.ToolsetConfig{
 					Name:      "monitor",
@@ -1814,7 +1814,7 @@ func TestPrebuiltTools(t *testing.T) {
 				},
 				"data": tools.ToolsetConfig{
 					Name:      "data",
-					ToolNames: []string{"execute_sql", "list_tables"},
+					ToolNames: []string{"execute_sql", "list_tables", "search_catalog"},
 				},
 				"monitor": tools.ToolsetConfig{
 					Name:      "monitor",

@@ -15,9 +15,13 @@
 package cloudsqlmysql
 
 import (
+	"bytes"
 	"context"
 	"database/sql"
+	"encoding/json"
 	"fmt"
+	"io"
+	"net/http"
 	"os"
 	"regexp"
 	"slices"
@@ -134,6 +138,17 @@ func TestCloudSQLMySQLToolEndpoints(t *testing.T) {
 	tmplSelectCombined, tmplSelectFilterCombined := tests.GetMySQLTmplToolStatement()
 	toolsFile = tests.AddTemplateParamConfig(t, toolsFile, CloudSQLMySQLToolType, tmplSelectCombined, tmplSelectFilterCombined, "")
 	toolsFile = tests.AddMySQLPrebuiltToolConfig(t, toolsFile)
+	// Add search catalog tool config
+	tools, ok := toolsFile["tools"].(map[string]any)
+	if !ok {
+		t.Fatalf("unable to get tools from config")
+	}
+	tools["my-search-catalog-tool"] = map[string]any{
+		"type":        "mysql-search-catalog",
+		"source":      "my-instance",
+		"description": "Tool to search the Cloud SQL catalog",
+	}
+	toolsFile["tools"] = tools
 
 	cmd, cleanup, err := tests.StartCmd(ctx, toolsFile, args...)
 	if err != nil {
@@ -165,6 +180,35 @@ func TestCloudSQLMySQLToolEndpoints(t *testing.T) {
 	tests.RunMySQLListActiveQueriesTest(t, ctx, pool)
 	tests.RunMySQLGetQueryPlanTest(t, ctx, pool, CloudSQLMySQLDatabase, tableNameParam)
 	tests.RunMySQLListTableStatsTest(t, ctx, pool, CloudSQLMySQLDatabase, tableNameParam, tableNameAuth)
+
+	t.Run("invoke my-search-catalog-tool", func(t *testing.T) {
+		api := "http://127.0.0.1:5000/api/tool/my-search-catalog-tool/invoke"
+		body := fmt.Sprintf(`{"prompt":"%s", "types":["TABLE"], "databaseIds":["%s"]}`, tableNameParam, CloudSQLMySQLDatabase)
+		req, err := http.NewRequest(http.MethodPost, api, bytes.NewBuffer([]byte(body)))
+		if err != nil {
+			t.Fatalf("unable to create request: %s", err)
+		}
+		req.Header.Add("Content-type", "application/json")
+		resp, err := http.DefaultClient.Do(req)
+		if err != nil {
+			t.Fatalf("unable to send request: %s", err)
+		}
+		defer resp.Body.Close()
+
+		if resp.StatusCode != http.StatusOK {
+			bodyBytes, _ := io.ReadAll(resp.Body)
+			t.Fatalf("response status code is not 200, got %d: %s", resp.StatusCode, string(bodyBytes))
+		}
+
+		var result map[string]interface{}
+		if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+			t.Fatalf("error parsing response body: %s", err)
+		}
+		_, ok := result["result"].(string)
+		if !ok {
+			t.Fatalf("expected 'result' field to be a string, got %T", result["result"])
+		}
+	})
 }
 
 // Test connection with different IP type
