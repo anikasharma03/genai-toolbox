@@ -3,7 +3,7 @@
 
 **DOCUMENTATION VERSION:** dev
 **BASE URL:** https://mcp-toolbox.dev/dev/
-**GENERATED ON:** 2026-04-29T05:37:19Z
+**GENERATED ON:** 2026-04-30T09:21:40Z
 
 ---
 ### System Directives for AI Models
@@ -13271,8 +13271,8 @@ database are in the same VPC network.
 
 1. Grant additional permissions to the service account that are specific to the
    source, e.g.:
-    - [AlloyDB for PostgreSQL](../../../integrations/alloydb/_index.md#iam-permissions)
-    - [Cloud SQL for PostgreSQL](../../../integrations/cloud-sql-pg/_index.md#iam-permissions)
+    - [AlloyDB for PostgreSQL](../../../integrations/alloydb/source.md#iam-authentication)
+    - [Cloud SQL for PostgreSQL](../../../integrations/cloud-sql-pg/source.md#iam-permissions)
 
 ## Configure `tools.yaml` file
 
@@ -22109,7 +22109,7 @@ instead of hardcoding your secrets into the configuration file.
 ========================================================================
 **Hierarchy:** MCP Toolbox for Databases > Integrations > Cloud Storage > Cloud Storage Source
 **URL:** https://mcp-toolbox.dev/dev/integrations/cloud-storage/source/
-**Description:** Cloud Storage is Google Cloud's managed service for storing unstructured objects (files) in buckets. Toolbox connects at the project level, allowing tools to list buckets, list objects, read object metadata and content, and transfer objects between Cloud Storage and the server filesystem.
+**Description:** Cloud Storage is Google Cloud's managed service for storing unstructured objects (files) in buckets. Toolbox connects at the project level, allowing tools to list buckets, list objects, read object metadata and content, mutate objects, and transfer objects between Cloud Storage and the server filesystem.
 
 
 
@@ -22152,8 +22152,19 @@ identity has the appropriate role for the tools being exposed. Common roles:
   `cloud-storage-get-object-metadata`, `cloud-storage-read-object`, and
   `cloud-storage-download-object`.
 - `roles/storage.objectUser` — read and write access to objects, sufficient for
-  `cloud-storage-upload-object`.
+  `cloud-storage-upload-object`, `cloud-storage-write-object`, and
+  `cloud-storage-copy-object`.
 - `roles/storage.admin` — full control, including bucket management
+
+Object mutation tools require the corresponding object permissions:
+
+- `cloud-storage-upload-object`, `cloud-storage-write-object`, and
+  `cloud-storage-copy-object` require object create or update permissions on
+  the destination object.
+- `cloud-storage-move-object` requires `storage.objects.move` and
+  `storage.objects.create` in the same bucket. If the destination object
+  already exists, `storage.objects.delete` is also required.
+- `cloud-storage-delete-object` requires object delete permission.
 
 See [Cloud Storage IAM roles][gcs-iam] for the full list.
 
@@ -22582,6 +22593,272 @@ The tool returns a JSON object with:
 |-------------|:--------:|:------------:|--------------------------------------------------------|
 | type        |  string  |     true     | Must be "cloud-storage-upload-object".                 |
 | source      |  string  |     true     | Name of the Cloud Storage source to upload objects to. |
+| description |  string  |     true     | Description of the tool that is passed to the LLM.     |
+
+
+
+
+========================================================================
+## cloud-storage-write-object
+========================================================================
+**Hierarchy:** MCP Toolbox for Databases > Integrations > Cloud Storage > Tools > cloud-storage-write-object
+**URL:** https://mcp-toolbox.dev/dev/integrations/cloud-storage/tools/cloud-storage-write-object/
+**Description:** A "cloud-storage-write-object" tool writes text content directly to a Cloud Storage object.
+
+
+
+## About
+
+A `cloud-storage-write-object` tool writes text content from the tool request
+directly into a Cloud Storage object. It is useful for creating or replacing
+small text objects without first writing a local file on the Toolbox server.
+
+When `content_type` is empty, Cloud Storage detects the content type from the
+written bytes.
+
+## Compatible Sources
+
+{{< compatible-sources >}}
+
+## Requirements
+
+The Cloud Storage credentials must be able to create or update the target
+object.
+
+## Parameters
+
+| **parameter** | **type** | **required** | **description**                                                                                       |
+|---------------|:--------:|:------------:|-------------------------------------------------------------------------------------------------------|
+| bucket        |  string  |     true     | Name of the Cloud Storage bucket to write into.                                                       |
+| object        |  string  |     true     | Full object name (path) within the bucket, e.g. `path/to/file.txt`.                                   |
+| content       |  string  |     true     | Text content to write to the Cloud Storage object.                                                    |
+| content_type  |  string  |    false     | MIME type to record on the written object. When empty, Cloud Storage auto-detects from the content.   |
+
+## Example
+
+```yaml
+kind: tool
+name: write_object
+type: cloud-storage-write-object
+source: my-gcs-source
+description: Use this tool to write text content to Cloud Storage.
+```
+
+## Output Format
+
+The tool returns a JSON object with:
+
+| **field**   | **type** | **description**                              |
+|-------------|:--------:|----------------------------------------------|
+| bucket      |  string  | Cloud Storage bucket that received content.  |
+| object      |  string  | Cloud Storage object name that was written.  |
+| bytes       | integer  | Number of bytes written.                     |
+| contentType |  string  | Content type recorded on the written object. |
+
+## Reference
+
+| **field**   | **type** | **required** | **description**                                      |
+|-------------|:--------:|:------------:|------------------------------------------------------|
+| type        |  string  |     true     | Must be "cloud-storage-write-object".                |
+| source      |  string  |     true     | Name of the Cloud Storage source to write objects to. |
+| description |  string  |     true     | Description of the tool that is passed to the LLM.   |
+
+
+
+
+========================================================================
+## cloud-storage-copy-object
+========================================================================
+**Hierarchy:** MCP Toolbox for Databases > Integrations > Cloud Storage > Tools > cloud-storage-copy-object
+**URL:** https://mcp-toolbox.dev/dev/integrations/cloud-storage/tools/cloud-storage-copy-object/
+**Description:** A "cloud-storage-copy-object" tool copies a Cloud Storage object to another object, including across buckets.
+
+
+
+## About
+
+A `cloud-storage-copy-object` tool copies an object from one Cloud Storage
+location to another. The source and destination bucket parameters are separate,
+so the destination can be in the same bucket or a different bucket.
+
+Existing destination objects are replaced.
+
+## Compatible Sources
+
+{{< compatible-sources >}}
+
+## Requirements
+
+The Cloud Storage credentials must be able to read the source object and create
+or update the destination object.
+
+## Parameters
+
+| **parameter**      | **type** | **required** | **description**                                                                    |
+|--------------------|:--------:|:------------:|------------------------------------------------------------------------------------|
+| source_bucket      |  string  |     true     | Name of the Cloud Storage bucket containing the source object.                      |
+| source_object      |  string  |     true     | Full source object name (path) within the source bucket, e.g. `path/to/file.txt`.   |
+| destination_bucket |  string  |     true     | Name of the Cloud Storage bucket to copy into.                                      |
+| destination_object |  string  |     true     | Full destination object name (path) within the destination bucket.                  |
+
+## Example
+
+```yaml
+kind: tool
+name: copy_object
+type: cloud-storage-copy-object
+source: my-gcs-source
+description: Use this tool to copy Cloud Storage objects.
+```
+
+## Output Format
+
+The tool returns a JSON object with:
+
+| **field**          | **type** | **description**                                  |
+|--------------------|:--------:|--------------------------------------------------|
+| sourceBucket       |  string  | Source Cloud Storage bucket.                     |
+| sourceObject       |  string  | Source Cloud Storage object name.                |
+| destinationBucket  |  string  | Destination Cloud Storage bucket.                |
+| destinationObject  |  string  | Destination Cloud Storage object name.           |
+| bytes              | integer  | Size of the copied object.                       |
+| contentType        |  string  | Content type recorded on the destination object. |
+
+## Reference
+
+| **field**   | **type** | **required** | **description**                                      |
+|-------------|:--------:|:------------:|------------------------------------------------------|
+| type        |  string  |     true     | Must be "cloud-storage-copy-object".                 |
+| source      |  string  |     true     | Name of the Cloud Storage source to copy objects in. |
+| description |  string  |     true     | Description of the tool that is passed to the LLM.   |
+
+
+
+
+========================================================================
+## cloud-storage-move-object
+========================================================================
+**Hierarchy:** MCP Toolbox for Databases > Integrations > Cloud Storage > Tools > cloud-storage-move-object
+**URL:** https://mcp-toolbox.dev/dev/integrations/cloud-storage/tools/cloud-storage-move-object/
+**Description:** A "cloud-storage-move-object" tool atomically moves or renames a Cloud Storage object within the same bucket.
+
+
+
+## About
+
+A `cloud-storage-move-object` tool atomically moves or renames an object within
+the same Cloud Storage bucket by using Cloud Storage's native move API.
+
+This tool does not perform cross-bucket moves. For a cross-bucket move, call
+`cloud-storage-copy-object` first, verify the destination, and then call
+`cloud-storage-delete-object` on the source.
+
+## Compatible Sources
+
+{{< compatible-sources >}}
+
+## Requirements
+
+The Cloud Storage credentials must have `storage.objects.move` and
+`storage.objects.create` permissions in the bucket. If the destination object
+already exists, `storage.objects.delete` is also required.
+
+## Parameters
+
+| **parameter**      | **type** | **required** | **description**                                                                 |
+|--------------------|:--------:|:------------:|---------------------------------------------------------------------------------|
+| bucket             |  string  |     true     | Name of the Cloud Storage bucket containing the object to move.                  |
+| source_object      |  string  |     true     | Full source object name (path) within the bucket, e.g. `path/to/file.txt`.       |
+| destination_object |  string  |     true     | Full destination object name (path) within the same bucket.                      |
+
+## Example
+
+```yaml
+kind: tool
+name: move_object
+type: cloud-storage-move-object
+source: my-gcs-source
+description: Use this tool to move or rename an object within a Cloud Storage bucket.
+```
+
+## Output Format
+
+The tool returns a JSON object with:
+
+| **field**          | **type** | **description**                                |
+|--------------------|:--------:|------------------------------------------------|
+| bucket             |  string  | Cloud Storage bucket containing the object.    |
+| sourceObject       |  string  | Original object name.                          |
+| destinationObject  |  string  | Destination object name.                       |
+| bytes              | integer  | Size of the moved object.                      |
+| contentType        |  string  | Content type recorded on the destination object. |
+
+## Reference
+
+| **field**   | **type** | **required** | **description**                                      |
+|-------------|:--------:|:------------:|------------------------------------------------------|
+| type        |  string  |     true     | Must be "cloud-storage-move-object".                 |
+| source      |  string  |     true     | Name of the Cloud Storage source to move objects in. |
+| description |  string  |     true     | Description of the tool that is passed to the LLM.   |
+
+
+
+
+========================================================================
+## cloud-storage-delete-object
+========================================================================
+**Hierarchy:** MCP Toolbox for Databases > Integrations > Cloud Storage > Tools > cloud-storage-delete-object
+**URL:** https://mcp-toolbox.dev/dev/integrations/cloud-storage/tools/cloud-storage-delete-object/
+**Description:** A "cloud-storage-delete-object" tool deletes a Cloud Storage object.
+
+
+
+## About
+
+A `cloud-storage-delete-object` tool deletes a single object from a Cloud
+Storage bucket.
+
+## Compatible Sources
+
+{{< compatible-sources >}}
+
+## Requirements
+
+The Cloud Storage credentials must be able to delete the target object.
+
+## Parameters
+
+| **parameter** | **type** | **required** | **description**                                                     |
+|---------------|:--------:|:------------:|---------------------------------------------------------------------|
+| bucket        |  string  |     true     | Name of the Cloud Storage bucket containing the object to delete.    |
+| object        |  string  |     true     | Full object name (path) within the bucket, e.g. `path/to/file.txt`.  |
+
+## Example
+
+```yaml
+kind: tool
+name: delete_object
+type: cloud-storage-delete-object
+source: my-gcs-source
+description: Use this tool to delete Cloud Storage objects.
+```
+
+## Output Format
+
+The tool returns a JSON object with:
+
+| **field** | **type** | **description**                             |
+|-----------|:--------:|---------------------------------------------|
+| bucket    |  string  | Cloud Storage bucket containing the object. |
+| object    |  string  | Cloud Storage object name that was deleted. |
+| deleted   | boolean  | Whether the delete request completed.       |
+
+## Reference
+
+| **field**   | **type** | **required** | **description**                                        |
+|-------------|:--------:|:------------:|--------------------------------------------------------|
+| type        |  string  |     true     | Must be "cloud-storage-delete-object".                 |
+| source      |  string  |     true     | Name of the Cloud Storage source to delete objects in. |
 | description |  string  |     true     | Description of the tool that is passed to the LLM.     |
 
 
@@ -32259,6 +32536,242 @@ description: |
 **Description:** None
 
 
+
+
+
+========================================================================
+## Claude Desktop and OAuth
+========================================================================
+**Hierarchy:** MCP Toolbox for Databases > Integrations > Looker > Samples > Claude Desktop and OAuth
+**URL:** https://mcp-toolbox.dev/dev/integrations/looker/samples/looker_claude_oauth/
+**Description:** How to connect to Looker from Claude Desktop with end-user credentials
+
+
+
+## Overview
+In order for OAuth to work for an MCP client, the client needs to know how to
+contact Looker, initiate the OAuth PKCE flow, and get a valid token. That
+token can then be used in the Authorization header in requests to MCP Toolbox.
+MCP Toolbox will then use that token when sending API requests to Looker.
+
+Claude Desktop does not support as many configuration options as Gemini CLI,
+so the methods for setting up Gemini CLI will not work. Instead, a new feature
+was needed in MCP Toolbox.
+
+One of the ways that a server can communicate its OAuth requirements is by
+providing a document called “OAuth Protected Resource Metadata” (PRM) defined
+by RFC 9728\. A server that supports PRM will respond to a HTTP GET request from
+the client to the location `/.well-known/oauth-protected-resource` with a json
+document that specifies the authorization servers to be used and the scopes that
+are required for the OAuth authorization. The client can then start the OAuth
+flow.
+
+MCP Toolbox recently added support for specifying a PRM file and will serve that
+GET request. This is needed to make OAuth from Claude Desktop work properly.
+
+## Configure and Deploy MCP Toolbox
+For an MCP Server to work with Claude Desktop, it must be accessed via HTTPS.
+The MCP Toolbox in server mode only supports HTTP. Therefore it must be deployed
+with a “reverse proxy” of some sort that receives the HTTPS messages, terminates
+the SSL, then forwards the message as HTTP. Responses are sent via HTTP to the
+proxy and are then sent to the client via HTTPS. This is a common pattern in the
+networking world and should not be difficult to set up. Google Cloud Run, for
+example, does this automatically.
+
+1.  The toolbox should be run with the following environment variables set.
+    `https://looker.example.com` should be substituted with the URL of your Looker
+    server.
+
+    * `LOOKER_BASE_URL=https://looker.example.com`  
+    * `LOOKER_USE_CLIENT_OAUTH=true`
+
+1.  The toolbox should be run with the following command line options:
+
+    * `--prebuilt=looker,looker-dev`  
+    * `--mcp-prm-file=prm.json`
+    
+    The `--mcp-prm-file=` setting is used to point to a json file with the settings
+    that should be used for this case. The file should look like this:
+    ```json
+    {
+      "resource": "https://looker-mcp-toolbox.example.com/mcp",
+      "authorization_servers": ["https://looker.example.com"],
+      "scopes_supported": ["cors_api"]
+    }
+    ```
+
+    The “resource” field will be the URL of the reverse proxy server with `/mcp`
+    added to the end. The “authorization\_servers” field will be an array with one
+    element, the Looker URL, the same value as `LOOKER_BASE_URL` above. The
+    “scopes\_supported” will also be an array with one element. That element is
+    always “cors\_api”.
+
+1.  Additionally, depending how the reverse proxy is set up, the following options
+    might be useful:
+
+    * `--address=0.0.0.0`  
+    * `--port=8080`
+
+    MCP Toolbox normally listens on 127.0.0.1 port 5000\. If the reverse proxy is on
+    another host, you will need to use `--address=0.0.0.0` to indicate that it
+    should bind to all ip addresses. The `--port=` setting is used if you need to
+    use a listening port other than 5000\. Google Cloud Run, for example,
+    automatically forwards external traffic from port 443, the HTTPS port, to 8080\.
+
+1.  Deploy the toolbox and check that navigating to the proxy server url with the
+    path `/.well-known/oauth-protected-resource`. You should see the contents of
+    your PRM file in the browser.
+
+    ![PRM file in browser](./PRM_file_in_browser.png)
+
+## Register the OAuth App in Looker
+1.  In Looker, go to “Applications” at the bottom of the list on the left side and
+    then select the “API Explorer”.  
+
+    ![Applications item](./applications.png)
+
+1.  On the left hand side, expand the “Auth” heading and choose “Register OAuth
+    App”. Choose “Run It” from the top right. You will see this screen.  
+
+    ![Register oauth app](./register_oauth_app.png)
+
+1.  For client_guid, enter the string `claude-desktop`. 
+
+1.  For the body, enter the following text:
+    ```json
+    {
+      "redirect_uri": "https://claude.ai/api/mcp/auth_callback",
+      "display_name": "Claude Desktop",
+      "description": "Claude Desktop",
+      "enabled": true
+    }
+    ```
+
+1.  Check the box next to “I understand that this API endpoint will change data.”
+    You should see this:  
+    
+    ![Register oauth app filled out](./register_oauth_app_2.png)
+
+1.  Now click the run button. Your response will look like this:
+
+    ![Register oauth app response](./register_oauth_app_response.png)
+
+## Configuring Claude Desktop
+1.  In Claude Desktop, go to Settings, then Connectors. You should see a page like
+    this:  
+
+    ![Claude Desktop connectors](./connectors.png)
+
+1.  Choose “Add custom connector”. Enter a name like “Looker”. For the URL use the
+    URL of the reverse proxy server with the path `/mcp` added to it.  
+
+    ![Add custom connector](./add_custom_connector.png)
+
+1.  Open “Advanced settings”. Enter `claude-desktop` as the OAuth Client Id. This is
+    the client\_guid we registered in Looker. Leave the OAuth Client Secret blank.  
+
+    ![Custom Connector Advanced Settings](./custom_connector_advanced_settings.png)
+
+1.  Now click “Add”. Looker will show up under the list of connectors.
+
+    ![Custom connectors](./custom_connectors.png)
+
+When you connect to Looker, Claude Desktop will initiate the PKCE Authentication
+flow with Looker in your browser.
+
+
+
+
+========================================================================
+## Connect to Looker with MCP Toolbox in Google Cloud Run
+========================================================================
+**Hierarchy:** MCP Toolbox for Databases > Integrations > Looker > Samples > Connect to Looker with MCP Toolbox in Google Cloud Run
+**URL:** https://mcp-toolbox.dev/dev/integrations/looker/samples/looker_cloud_run/
+**Description:** How to start an MCP Toolbox instance in Google Cloud Run to connect to Looker.
+
+
+
+## Running MCP Toolbox in Google Cloud Run
+
+It is easy to run MCP Toolbox in Google Cloud Run.
+
+1.  Navigate to Cloud Run Overview in a Google Cloud Console project. Choose “Deploy container”:  
+
+    ![Deploy a Web Service](./deploy_a_web_service.png)
+
+1.  Set the “Image name” to
+    `us-central1-docker.pkg.dev/database-toolbox/toolbox/toolbox:latest`. Set
+    the “Service name” to `looker-mcp-toolbox` and choose the “Region”. Note the
+    “Endpoint URL”, you will need it later. Set the “Authentication” to “Public”.  
+
+    ![Image configuration](./image_config.png)
+
+1.  Set “Service scaling” to Auto with a minimum number of instances of “1”. Set
+    “Ingress” to “All”.
+    
+    ![Image configuration 2](./image_config_2.png)
+
+1.  Now open the drop down for “Containers, Networking, Security”.
+
+1.  Under “Container settings” set “Container arguments” to
+    `--prebuilt=looker,looker-dev`, `--port=8080`, `--address=0.0.0.0`, and
+    `--mcp-prm-file=/app/prm_file`.  
+
+    ![Container Settings](./container_settings.png)
+
+1.  Under “Variables & Secrets” set `LOOKER_BASE_URL`, setting it to the URL of
+    your Looker server, and `LOOKER_USE_CLIENT_OAUTH=true`.
+    
+    ![Container variables](./container_variables.png)
+
+1.  Under “Container Volumes” mount a new Secret Volume with a mount path of
+    `/app`. Create a new secret `prm_file` with the contents of the PRM, for
+    example:
+
+    ```json
+    {
+    "resource": "https://<your-cloud-run-url>/mcp",
+    "authorization_servers": ["https://<your-looker-instance>.looker.com"],
+    "scopes_supported": ["cors_api"]
+    }
+    ```
+
+    ![Create secret](./create_secret.png)
+
+    ![Container secret volume](./container_secret_volume.png)
+
+1.  You may also need to go to IAM and grant the role “Secret Manager Secret
+    Accessor” to your compute service account identity.
+
+1.  Now click “Done” in the lower right corner. Then click Create to start the
+    service.
+
+1.  Validate the service is running by going to the URL, followed by
+    `/.well-known/oauth-protected-resource`.
+
+## Using the MCP Toolbox Via OAuth and Gemini CLI
+
+1.  Follow the directions to register the [OAuth App in Looker](../looker_gemini_oauth/)
+
+1.  In `$HOME/.gemini/settings.json` add the following stanza, using the Endpoint URL
+    you saved earlier with `/mcp` appended.
+
+    ```json
+    "mcpServers": {
+        "looker": {
+            "httpUrl": "https://<your-cloud-run-url>/mcp",
+            "oauth": {
+                "clientId": "gemini-cli",
+                "redirectUri": "http://localhost:7777/oauth/callback"
+            }
+        }
+    },
+    ```
+1.  Start Gemini CLI and issue the command `/mcp auth looker`. Gemini CLI will start
+    the OAuth flow. Approve access in the browser.
+
+1.  Validate that everything works by issuing a prompt in Gemini CLI like "What Looker
+    models do I have access to?"
 
 
 

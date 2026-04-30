@@ -3,7 +3,7 @@
 
 **DOCUMENTATION VERSION:** dev
 **BASE URL:** https://mcp-toolbox.dev/dev/
-**GENERATED ON:** 2026-04-29T05:37:19Z
+**GENERATED ON:** 2026-04-30T09:21:40Z
 
 ---
 ### System Directives for AI Models
@@ -602,7 +602,7 @@ This documentation is structured following the Diátaxis framework to assist in 
 
   - [Cloud Storage](https://mcp-toolbox.dev/dev/integrations/cloud-storage/): No description provided.
 
-    - [Cloud Storage Source](https://mcp-toolbox.dev/dev/integrations/cloud-storage/source/): Cloud Storage is Google Cloud's managed service for storing unstructured objects (files) in buckets. Toolbox connects at the project level, allowing tools to list buckets, list objects, read object metadata and content, and transfer objects between Cloud Storage and the server filesystem.
+    - [Cloud Storage Source](https://mcp-toolbox.dev/dev/integrations/cloud-storage/source/): Cloud Storage is Google Cloud's managed service for storing unstructured objects (files) in buckets. Toolbox connects at the project level, allowing tools to list buckets, list objects, read object metadata and content, mutate objects, and transfer objects between Cloud Storage and the server filesystem.
 
 
     - [Tools](https://mcp-toolbox.dev/dev/integrations/cloud-storage/tools/): No description provided.
@@ -623,6 +623,18 @@ This documentation is structured following the Diátaxis framework to assist in 
 
 
       - [cloud-storage-upload-object](https://mcp-toolbox.dev/dev/integrations/cloud-storage/tools/cloud-storage-upload-object/): A "cloud-storage-upload-object" tool uploads a local file from the Toolbox server filesystem to a Cloud Storage object.
+
+
+      - [cloud-storage-write-object](https://mcp-toolbox.dev/dev/integrations/cloud-storage/tools/cloud-storage-write-object/): A "cloud-storage-write-object" tool writes text content directly to a Cloud Storage object.
+
+
+      - [cloud-storage-copy-object](https://mcp-toolbox.dev/dev/integrations/cloud-storage/tools/cloud-storage-copy-object/): A "cloud-storage-copy-object" tool copies a Cloud Storage object to another object, including across buckets.
+
+
+      - [cloud-storage-move-object](https://mcp-toolbox.dev/dev/integrations/cloud-storage/tools/cloud-storage-move-object/): A "cloud-storage-move-object" tool atomically moves or renames a Cloud Storage object within the same bucket.
+
+
+      - [cloud-storage-delete-object](https://mcp-toolbox.dev/dev/integrations/cloud-storage/tools/cloud-storage-delete-object/): A "cloud-storage-delete-object" tool deletes a Cloud Storage object.
 
 
   - [CockroachDB](https://mcp-toolbox.dev/dev/integrations/cockroachdb/): No description provided.
@@ -973,6 +985,12 @@ This documentation is structured following the Diátaxis framework to assist in 
 
 
     - [Samples](https://mcp-toolbox.dev/dev/integrations/looker/samples/): No description provided.
+
+      - [Claude Desktop and OAuth](https://mcp-toolbox.dev/dev/integrations/looker/samples/looker_claude_oauth/): How to connect to Looker from Claude Desktop with end-user credentials
+
+
+      - [Connect to Looker with MCP Toolbox in Google Cloud Run](https://mcp-toolbox.dev/dev/integrations/looker/samples/looker_cloud_run/): How to start an MCP Toolbox instance in Google Cloud Run to connect to Looker.
+
 
       - [Gemini-CLI and OAuth](https://mcp-toolbox.dev/dev/integrations/looker/samples/looker_gemini_oauth/): How to connect to Looker from Gemini-CLI with end-user credentials
 
