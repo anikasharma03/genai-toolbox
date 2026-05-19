@@ -1,9 +1,9 @@
 ---
-title: "dataplex-search-entries"
+title: "search-entries"
 type: docs
 weight: 1
 description: >
-  A "dataplex-search-entries" tool allows to search for entries based on the provided query.
+  A "search-entries" tool allows to search for entries based on the provided query.
 ---
 
 ## About

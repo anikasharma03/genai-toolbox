@@ -1,9 +1,9 @@
 ---
-title: "dataplex-lookup-entry"
+title: "lookup-entry"
 type: docs
 weight: 1
 description: >
-  A "dataplex-lookup-entry" tool returns details of a particular entry in Knowledge Catalog.
+  A "lookup-entry" tool returns details of a particular entry in Knowledge Catalog.
 ---
 
 ## About

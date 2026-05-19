@@ -1,5 +1,5 @@
 ---
-title: "dataplex-lookup-context"
+title: "lookup-context"
 type: docs
 weight: 1
 description: > 

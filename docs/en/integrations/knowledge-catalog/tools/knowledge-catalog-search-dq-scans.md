@@ -1,9 +1,9 @@
 ---
-title: "dataplex-search-dq-scans"
+title: "search-dq-scans"
 type: docs
 weight: 1
 description: >
-  A "dataplex-search-dq-scans" tool allows to search for data quality scans based on the provided parameters.
+  A "search-dq-scans" tool allows to search for data quality scans based on the provided parameters.
 aliases:
 - /resources/tools/dataplex-search-dq-scans
 ---
