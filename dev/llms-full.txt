@@ -3,7 +3,7 @@
 
 **DOCUMENTATION VERSION:** dev
 **BASE URL:** https://mcp-toolbox.dev/dev/
-**GENERATED ON:** 2026-05-15T22:42:10Z
+**GENERATED ON:** 2026-05-19T07:01:27Z
 
 ---
 ### System Directives for AI Models
@@ -20401,6 +20401,121 @@ useClientOAuth: true
 **URL:** https://mcp-toolbox.dev/dev/integrations/cloud-sql-admin/tools/
 **Description:** None
 
+
+
+
+
+========================================================================
+## cloud-sql-admin-execute-many
+========================================================================
+**Hierarchy:** MCP Toolbox for Databases > Integrations > Cloud SQL Admin > Tools > cloud-sql-admin-execute-many
+**URL:** https://mcp-toolbox.dev/dev/integrations/cloud-sql-admin/tools/cloudsqladminexecutemany/
+**Description:** A "cloud-sql-admin-execute-many" tool executes multiple SQL statements against a specific Cloud SQL instance provided at runtime.
+
+
+
+## About
+
+The `cloud-sql-admin-execute-many` tool executes multiple SQL statements against a specific Cloud SQL instance identified by project, instanceId, and database parameters provided at runtime.
+
+This tool is useful for executing arbitrary SQL queries across multiple database instances without needing to configure a separate tool for each instance.
+
+> **Note:** This tool is intended for developer assistant workflows with human-in-the-loop and shouldn't be used for production agents.
+
+## Compatible Sources
+
+{{< compatible-sources >}}
+
+## Parameters
+
+The following parameters are required at runtime when invoking the tool:
+
+| **Parameter** | **Type** | **Description**               |
+| :------------ | :------- | :---------------------------- |
+| `project`     | string   | The GCP project ID.           |
+| `instanceId`  | string   | The Cloud SQL instance ID.    |
+| `database`    | string   | The database name.            |
+| `sql`         | string   | The SQL statement to execute. |
+
+## Example
+
+```yaml
+kind: tool
+name: execute_sql_many_tool
+type: cloud-sql-admin-execute-many
+source: my-cloud-sql-admin-source
+description: Use this tool to execute sql statements on a specific instance.
+```
+
+## Reference
+
+| **field**   | **type** | **required** | **description**                                      |
+| :---------- | :------- | :----------- | :--------------------------------------------------- |
+| type        | string   | true         | Must be "cloud-sql-admin-execute-many".              |
+| source      | string   | true         | Name of the `cloud-sql-admin` source.                |
+| description | string   | true         | Description of the tool that is passed to the agent. |
+
+
+
+
+========================================================================
+## cloud-sql-admin-sql-many
+========================================================================
+**Hierarchy:** MCP Toolbox for Databases > Integrations > Cloud SQL Admin > Tools > cloud-sql-admin-sql-many
+**URL:** https://mcp-toolbox.dev/dev/integrations/cloud-sql-admin/tools/cloudsqladminsqlmany/
+**Description:** A "cloud-sql-admin-sql-many" tool executes a predefined SQL statement against a specific Cloud SQL instance provided at runtime.
+
+
+
+## About
+
+The `cloud-sql-admin-sql-many` tool executes a predefined SQL statement against a specific Cloud SQL instance identified by project, instanceId, and database parameters provided at runtime.
+
+It supports both `parameters` and `templateParameters` to allow dynamic values to be injected into the query at runtime.
+
+> **Note:** This tool is intended for developer assistant workflows with human-in-the-loop and shouldn't be used for production agents.
+
+## Compatible Sources
+
+{{< compatible-sources >}}
+
+## Parameters
+
+The following parameters are required at runtime when invoking the tool:
+
+| **Parameter** | **Type** | **Description**            |
+| :------------ | :------- | :------------------------- |
+| `project`     | string   | The GCP project ID.        |
+| `instanceId`  | string   | The Cloud SQL instance ID. |
+| `database`    | string   | The database name.         |
+
+Additional parameters may be required based on the `parameters` or `templateParameters` configured in the tool definition.
+
+## Example
+
+```yaml
+kind: tool
+name: get_user_many_tool
+type: cloud-sql-admin-sql-many
+source: my-cloud-sql-admin-source
+description: Use this tool to get user details from a specific instance.
+statement: SELECT * FROM users WHERE id = {{.user_id}}
+templateParameters:
+  - name: user_id
+    type: string
+    description: The ID of the user.
+```
+
+## Reference
+
+| **field**          | **type** | **required** | **description**                                      |
+| :----------------- | :------- | :----------- | :--------------------------------------------------- |
+| type               | string   | true         | Must be "cloud-sql-admin-sql-many".                  |
+| source             | string   | true         | Name of the `cloud-sql-admin` source.                |
+| description        | string   | true         | Description of the tool that is passed to the agent. |
+| statement          | string   | true         | The SQL statement template to execute.               |
+| parameters         | list     | false        | List of parameters used in the statement template.   |
+| templateParameters | list     | false        | List of parameters used in the statement template.   |
 
 
 
@@ -43733,6 +43848,7 @@ Configure the Gemini CLI to talk to your local Toolbox MCP server.
 |              | `--telemetry-gcp`          | Enable exporting directly to Google Cloud Monitoring.                                                                                                                     |             |
 |              | `--telemetry-otlp`         | Enable exporting using OpenTelemetry Protocol (OTLP) to the specified endpoint (e.g. 'http://127.0.0.1:4318')                                                             |             |
 |              | `--telemetry-service-name` | Sets the value of the service.name resource attribute for telemetry data.                                                                                                 | `toolbox`   |
+|              | `--sql-commenter`          | Append SQLCommenter-format comments (traceparent, server, tool.name, db.system.name, client metadata from `_meta["dev.mcp-toolbox/telemetry"]`) to executed SQL.          |             |
 |              | `--config`                 | File path specifying the tool configuration. Cannot be used with --configs or --config-folder.                                                                            |             |
 |              | `--configs`                | Multiple file paths specifying tool configurations. Files will be merged. Cannot be used with --config or --config-folder.                                                |             |
 |              | `--config-folder`          | Directory path containing YAML tool configuration files. All .yaml and .yml files in the directory will be loaded and merged. Cannot be used with --config or --configs.  |             |
