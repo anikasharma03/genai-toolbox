@@ -802,8 +802,6 @@ func runSpannerListTablesTest(t *testing.T, tableNameParam, tableNameAuth, table
 	}
 }
 
-
-
 // Helper function to verify graph list results
 func verifyGraphListResult(t *testing.T, body map[string]interface{}, expectedGraphs []string, expectedSimpleFormat bool) {
 	// Parse the result
